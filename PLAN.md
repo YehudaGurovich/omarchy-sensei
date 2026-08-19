@@ -1,0 +1,51 @@
+# Sensei — build plan
+
+Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
+
+## Architecture decisions
+
+1. **Keybinding resolution by description.** Omarchy Quattro routes all binds
+   through the Lua dispatcher (`__lua`), so dispatcher/arg is opaque. Every
+   default bind carries a human `description` (235/238 on a customized
+   machine). Lessons reference descriptions ("Move window to workspace 3");
+   Sensei resolves the actual key from `hyprctl binds -j` at lesson start and
+   renders modmask+key as e.g. `SUPER + 3`.
+2. **Step completion via Hyprland IPC socket2 events** (`workspace`,
+   `openwindow`, `submap`, `fullscreen`, `openlayer`, …). Compositor facts,
+   independent of how the user triggered them.
+3. **Spotlight via layer geometry.** Bar located through `hyprctl layers -j`
+   namespace `omarchy-bar`. Missing anchor → step runs without spotlight.
+4. **Degradation ladder:** spotlight + auto-detect → detect only → manual
+   Next. Unresolvable bind → lesson says "you have no binding for this".
+5. **Lessons are data** (`lessons/lessons.js`), engine is generic. Loaded as a
+   relative JS import to avoid runtime path resolution issues.
+
+## Day plan
+
+- **Day 1 (Thu Aug 21):** walkthrough engine — bind resolver (`hyprctl binds -j`
+  via Quickshell Process), socket2 event listener, step state machine,
+  step card UI replacing the placeholder detail view.
+- **Day 2 (Fri Aug 22):** spotlight overlay (scrim with cutout, layer geometry),
+  manual-Next fallback, lesson completion state, welcome tour trigger.
+- **Day 3 (Sat Aug 23):** content — 8–12 lessons covering workspaces, window
+  movement, tiling/floating, resize submap, screenshots, menus, themes,
+  lock/idle, clipboard. Test on default Omarchy in a VM if possible.
+- **Day 4 (Sun Aug 24 morning is the deadline — finish Sat night):** polish,
+  preview.png, README pass, validate, fresh-install test, submit form.
+
+## Dev loop
+
+```sh
+./dev.sh          # sync repo -> ~/.config/omarchy/plugins/<id> and rescan
+omarchy restart shell   # when hot reload does not pick up changes
+omarchy-shell shell toggle io.github.yehudagurovich.sensei '{}'
+```
+
+Logs: `qs log` workflow.
+
+## Open questions
+
+- Exact wording drift of bind descriptions across Omarchy versions — keep an
+  alias map per lesson if needed.
+- Whether `openlayer` events reliably identify the omarchy menu for
+  menu-related lessons.
