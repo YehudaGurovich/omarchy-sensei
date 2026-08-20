@@ -24,6 +24,48 @@
 
 var LESSONS = [
   {
+    id: "welcome-tour",
+    title: "Welcome tour — the basics",
+    keywords: ["welcome", "start", "basics", "tour", "new", "first"],
+    intro: "Five minutes to the core moves. The sensei waits for each one — take your time.",
+    steps: [
+      {
+        say: "Jump to workspace 2.",
+        bind: "Switch to workspace 2",
+        await: [
+          { event: "workspace", data: "^2$" },
+          { event: "focusedmon", data: ",2$" }
+        ],
+        spotlight: "bar"
+      },
+      {
+        say: "Open a terminal.",
+        bind: "Terminal",
+        await: {
+          event: "openwindow",
+          data: "^[^,]*,[^,]*,([Aa]lacritty|foot|footclient|kitty|com\\.mitchellh\\.ghostty|ghostty|org\\.wezfurlong\\.wezterm|wezterm|[Kk]onsole|[Ss]t|[Xx]term),"
+        },
+        spotlight: null
+      },
+      {
+        say: "Carry that terminal to workspace 1 — you travel with it.",
+        bind: "Move window to workspace 1",
+        await: { event: "movewindow", data: ",1$" },
+        spotlight: null
+      },
+      {
+        // The tour flow guarantees the former workspace here is 2.
+        say: "Bounce back to the workspace you came from.",
+        bind: "Former workspace",
+        await: [
+          { event: "workspace", data: "^2$" },
+          { event: "focusedmon", data: ",2$" }
+        ],
+        spotlight: "bar"
+      }
+    ]
+  },
+  {
     id: "switch-workspaces",
     title: "Switch between workspaces",
     keywords: ["workspace", "desktop", "navigate", "move around"],

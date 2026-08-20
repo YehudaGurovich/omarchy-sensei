@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "io.github.yehudagurovich.sensei",
   "name": "Sensei",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "author": "YehudaGurovich",
   "license": "MIT",
   "description": "Interactive, do-it-yourself tutorials for Omarchy. Ask how to do something, then learn by doing it — Sensei reads your real keybindings and waits until you actually perform each step.",

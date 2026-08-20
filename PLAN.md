@@ -42,8 +42,15 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
     only for moves, terminal class match for openwindow, deterministic
     former-workspace target); resolver merged into one map lookup with
     user-override-wins semantics.
-- **Day 2 (Fri Aug 22):** spotlight overlay (scrim with cutout, layer geometry),
-  manual-Next fallback, lesson completion state, welcome tour trigger.
+- **Day 2 — DONE (Aug 20, issues #1–#3):** spotlight overlay (dim panes +
+  ring from layer geometry, window-local via monitor offset, silent
+  degradation), persistent progress (`progress.json` with a points field,
+  atomic writes), welcome tour lesson + first-time hint. Verified end to end
+  including a real window move and a restart-survival check; spotlight
+  confirmed visually by screenshot.
+  Known upstream issue: quickshell can SIGSEGV on shell reload in
+  `IpcHandler::onPostReload` (`__dynamic_cast`) — crash is in Quickshell C++,
+  auto-respawns, not plugin-caused; report upstream separately.
 - **Day 3 (Sat Aug 23):** content — 8–12 lessons covering workspaces, window
   movement, tiling/floating, resize submap, screenshots, menus, themes,
   lock/idle, clipboard. Test on default Omarchy in a VM if possible.

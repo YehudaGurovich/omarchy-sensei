@@ -28,7 +28,10 @@ Item {
   property bool stepBindFound: true
   property string praiseText: ""
   property bool skipUsed: false
-  property var completedIds: [] // in-memory for now; persistence lands with Day 2
+  property var completedIds: []
+  // Window-local {x,y,w,h} of the region the current step highlights, or null.
+  property var spotlightRect: null
+  property string spotlightNs: ""
 
   // Shares the [menu] surface tokens so every Omarchy theme styles Sensei.
   property color background: Color.menu.background
@@ -140,6 +143,58 @@ Item {
     root.stepCaps = r.caps
     root.stepBindFound = r.found
     if (!r.found) console.log("sensei: no binding found for \"" + step.bind + "\"")
+    root.querySpotlight(step)
+  }
+
+  // Spotlight anchors are layer surfaces resolved by namespace at step time;
+  // a missing anchor (replaced bar, other monitor) degrades to no spotlight.
+  function querySpotlight(step) {
+    root.spotlightRect = null
+    var ns = ({ bar: "omarchy-bar" })[step && step.spotlight]
+    if (!ns) return
+    root.spotlightNs = ns
+    if (!spotlightProcess.running) spotlightProcess.running = true
+  }
+
+  function applySpotlight(output) {
+    var parts = String(output || "").split("\n---\n")
+    if (parts.length < 2) return
+    var layers, monitors
+    try {
+      layers = JSON.parse(parts[0])
+      monitors = JSON.parse(parts[1])
+    } catch (e) { return }
+    var screenName = coachWindow.screen ? String(coachWindow.screen.name) : ""
+    var monitor = null
+    for (var i = 0; i < monitors.length; i++) {
+      if (monitors[i].name === screenName) { monitor = monitors[i]; break }
+    }
+    var forScreen = layers[screenName]
+    if (!monitor || !forScreen || !forScreen.levels) return
+    for (var level in forScreen.levels) {
+      var surfaces = forScreen.levels[level]
+      for (var j = 0; j < surfaces.length; j++) {
+        if (surfaces[j].namespace !== root.spotlightNs) continue
+        root.spotlightRect = {
+          x: surfaces[j].x - monitor.x,
+          y: surfaces[j].y - monitor.y,
+          w: surfaces[j].w,
+          h: surfaces[j].h
+        }
+        return
+      }
+    }
+  }
+
+  Process {
+    id: spotlightProcess
+    running: false
+    command: ["bash", "-c", 'printf "%s\\n---\\n%s\\n" "$(hyprctl -j layers)" "$(hyprctl -j monitors)"']
+
+    stdout: StdioCollector {
+      waitForEnd: true
+      onStreamFinished: root.applySpotlight(text)
+    }
   }
 
   // viaButton distinguishes the manual button from a detected event. It only
@@ -152,9 +207,13 @@ Item {
     if (viaButton && step && step.await) root.skipUsed = true
     console.log("sensei: step " + (root.stepIndex + 1) + "/" + root.lesson.steps.length + " complete")
     if (root.stepIndex + 1 >= root.lesson.steps.length) {
-      if (!root.skipUsed && root.completedIds.indexOf(root.lesson.id) === -1)
+      if (!root.skipUsed && root.completedIds.indexOf(root.lesson.id) === -1) {
         root.completedIds = root.completedIds.concat([root.lesson.id])
+        progress.completed = root.completedIds
+        progress.save()
+      }
       root.phase = "complete"
+      root.spotlightRect = null
     } else {
       root.praiseText = "✓  " + Dojo.praise(root.stepIndex)
       praiseTimer.restart()
@@ -167,7 +226,16 @@ Item {
     root.lesson = null
     root.phase = "idle"
     root.praiseText = ""
+    root.spotlightRect = null
     praiseTimer.stop()
+  }
+
+  Progress {
+    id: progress
+    onLoaded: {
+      root.completedIds = progress.completed
+      if (root.opened) root.rebuildDisplay()
+    }
   }
 
   Timer {
@@ -222,6 +290,7 @@ Item {
         caps: root.stepCaps,
         bindFound: root.stepBindFound,
         skipUsed: root.skipUsed,
+        spotlight: !!root.spotlightRect,
         completed: root.completedIds
       })
     }
@@ -406,10 +475,23 @@ Item {
           }
         }
 
+        Text {
+          id: firstTimeHint
+          width: parent.width
+          visible: root.completedIds.length === 0
+          text: "First time in the dojo? Start with the welcome tour."
+          color: root.foreground
+          opacity: 0.6
+          font.family: root.fontFamily
+          font.pixelSize: root.smallFont
+          wrapMode: Text.WordWrap
+        }
+
         ListView {
           id: lessonList
           width: parent.width
           height: parent.height - root.headerHeight - beltRow.height - root.contentSpacing * 2
+            - (firstTimeHint.visible ? firstTimeHint.height + root.contentSpacing : 0)
           model: displayModel
           clip: true
 
@@ -474,6 +556,59 @@ Item {
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
     mask: Region { item: coachSurface }
+
+    // Spotlight: dim the monitor around the anchored region and ring it.
+    // Drawn before the coach surface so the card stays on top; input is
+    // masked to the card, so the dim panes never swallow clicks.
+    Item {
+      id: spotlightArea
+      anchors.fill: parent
+      visible: root.phase === "await" && !!root.spotlightRect
+
+      readonly property real pad: Style.space(4)
+      readonly property real rx: root.spotlightRect ? root.spotlightRect.x - pad : 0
+      readonly property real ry: root.spotlightRect ? root.spotlightRect.y - pad : 0
+      readonly property real rw: root.spotlightRect ? root.spotlightRect.w + pad * 2 : 0
+      readonly property real rh: root.spotlightRect ? root.spotlightRect.h + pad * 2 : 0
+
+      Rectangle {
+        x: 0; y: 0
+        width: spotlightArea.width
+        height: Math.max(0, spotlightArea.ry)
+        color: root.scrim
+        opacity: 0.5
+      }
+      Rectangle {
+        x: 0; y: spotlightArea.ry + spotlightArea.rh
+        width: spotlightArea.width
+        height: Math.max(0, spotlightArea.height - spotlightArea.ry - spotlightArea.rh)
+        color: root.scrim
+        opacity: 0.5
+      }
+      Rectangle {
+        x: 0; y: spotlightArea.ry
+        width: Math.max(0, spotlightArea.rx)
+        height: spotlightArea.rh
+        color: root.scrim
+        opacity: 0.5
+      }
+      Rectangle {
+        x: spotlightArea.rx + spotlightArea.rw; y: spotlightArea.ry
+        width: Math.max(0, spotlightArea.width - spotlightArea.rx - spotlightArea.rw)
+        height: spotlightArea.rh
+        color: root.scrim
+        opacity: 0.5
+      }
+
+      Rectangle {
+        x: spotlightArea.rx; y: spotlightArea.ry
+        width: spotlightArea.rw; height: spotlightArea.rh
+        color: "transparent"
+        radius: root.cornerRadius
+        border.color: root.selectedBackground
+        border.width: Math.max(2, Style.space(2))
+      }
+    }
 
     BorderSurface {
       id: coachSurface

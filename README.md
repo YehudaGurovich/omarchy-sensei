@@ -17,9 +17,9 @@ actually do it before moving on — like a game tutorial for your window manager
   Use a key, a menu, or the mouse — if you did the thing, you advance.
   Skipped steps do not count: belts are earned, not clicked.
 - **It degrades gracefully.** No matching keybinding or an exotic setup —
-  every step still works: undetectable steps advance with a Next button, and
-  any step can be skipped. (Spotlight highlighting of screen regions is the
-  next rung, in development.)
+  every step still works: steps that anchor to a screen region spotlight it
+  (dim + ring) and fall back silently when the anchor is missing;
+  undetectable steps advance with a Next button; any step can be skipped.
 
 ## Install
 
@@ -52,7 +52,8 @@ Lessons are plain data in `lessons/lessons.js`. Each step declares:
 - `bind` — the keybinding description to resolve from your active config
 - `await` — the Hyprland event (or alternatives) that proves you did it;
   `null` makes the step advance with a manual Next button
-- `spotlight` — reserved: a screen region to highlight (in development)
+- `spotlight` — a screen region to highlight while the step waits
+  (`"bar"` rings the Omarchy bar; missing anchors degrade silently)
 
 Contributions of new lessons are welcome.
 
@@ -60,17 +61,19 @@ Contributions of new lessons are welcome.
 
 Sensei is a penguin master with a white beard and a red headband. Completing
 lessons — without skipping steps — raises your belt rank, from white belt
-toward black belt. Your
+toward black belt. Progress persists across restarts
+(`~/.local/state/omarchy-sensei/progress.json`). First-time visitors are
+pointed at the welcome tour, which walks the core moves in four steps. Your
 training happens in a compact coach card in the corner of the screen — the
 desktop keeps keyboard focus, so you perform every step for real.
 
 ## Status
 
-Version 0.2.0 — the walkthrough engine works end to end: live key
+Version 0.3.0 — the walkthrough engine works end to end: live key
 resolution (including Lua `code:` binds via the compiled keymap),
-event-driven step completion (multi-monitor aware), belts, and the coach
-card. Next: spotlight highlighting, persistent progress, and more lessons.
-See `PLAN.md`.
+event-driven step completion (multi-monitor aware), spotlight highlighting,
+persistent progress and belts, the welcome tour, and the coach card.
+Next: more lessons. See `PLAN.md`.
 
 ## License
 
