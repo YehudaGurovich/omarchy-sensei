@@ -30,7 +30,7 @@ Planned listing:
 ## Checklist before submitting
 
 - [ ] Walkthrough engine works end to end on a default Omarchy install
-- [ ] 8–12 polished lessons, welcome tour chains the basics
+- [x] 8–12 polished lessons, welcome tour chains the basics (10 lessons, all verified)
 - [ ] `omarchy plugin validate` passes
 - [ ] Fresh install test: `omarchy plugin add <repo-url> --enable` on a clean setup
 - [ ] `preview.png` (screenshot or short GIF-derived frame) in the repo

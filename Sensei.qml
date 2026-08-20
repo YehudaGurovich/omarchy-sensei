@@ -139,10 +139,16 @@ Item {
   function applyStep() {
     var step = root.currentStep()
     if (!step) return
-    var r = binds.resolve(step.bind)
-    root.stepCaps = r.caps
-    root.stepBindFound = r.found
-    if (!r.found) console.log("sensei: no binding found for \"" + step.bind + "\"")
+    if (!step.bind) {
+      // The instruction itself carries the key (e.g. "press Esc").
+      root.stepCaps = []
+      root.stepBindFound = true
+    } else {
+      var r = binds.resolve(step.bind)
+      root.stepCaps = r.caps
+      root.stepBindFound = r.found
+      if (!r.found) console.log("sensei: no binding found for \"" + step.bind + "\"")
+    }
     root.querySpotlight(step)
   }
 

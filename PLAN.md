@@ -51,9 +51,17 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
   Known upstream issue: quickshell can SIGSEGV on shell reload in
   `IpcHandler::onPostReload` (`__dynamic_cast`) — crash is in Quickshell C++,
   auto-respawns, not plugin-caused; report upstream separately.
-- **Day 3 (Sat Aug 23):** content — 8–12 lessons covering workspaces, window
-  movement, tiling/floating, resize submap, screenshots, menus, themes,
-  lock/idle, clipboard. Test on default Omarchy in a VM if possible.
+- **Day 3 — DONE (Aug 20, issue #4):** content pack — 10 lessons total:
+  welcome tour, workspaces, move window, terminal, float/tile, fullscreen,
+  scratchpad, Omarchy menu, emojis, clipboard. Every await verified against
+  captured socket2 events (changefloatingmode, fullscreen, activespecial,
+  movewindow, openlayer/closelayer by namespace); all lessons exercised end
+  to end on this machine. Steps whose key is in the instruction (e.g. Esc to
+  close a menu) use bind: null — keycaps hidden, event still verified.
+  Dropped from the candidate list: themes (no distinguishable event — the
+  theme menu shares the omarchy-menu namespace), lock/idle (locks the
+  session mid-lesson), resize submap and window groups (no reliably tight
+  events confirmed yet).
 - **Day 4 (Sun Aug 24 morning is the deadline — finish Sat night):** polish,
   preview.png, README pass, validate, fresh-install test, submit form.
 

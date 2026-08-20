@@ -141,6 +141,132 @@ var LESSONS = [
         spotlight: null
       }
     ]
+  },
+  {
+    id: "float-window",
+    title: "Float and tile a window",
+    keywords: ["float", "floating", "tile", "tiling", "toggle"],
+    intro: "Tiled windows share the screen; floating windows sit on top, free to move.",
+    steps: [
+      {
+        say: "Pop the focused window out of the tiling grid.",
+        bind: "Toggle window floating/tiling",
+        await: { event: "changefloatingmode", data: ",1$" },
+        spotlight: null
+      },
+      {
+        say: "Tuck it back into the grid.",
+        bind: "Toggle window floating/tiling",
+        await: { event: "changefloatingmode", data: ",0$" },
+        spotlight: null
+      }
+    ]
+  },
+  {
+    id: "fullscreen",
+    title: "Go full screen",
+    keywords: ["fullscreen", "full", "screen", "maximize", "focus"],
+    intro: "One keybinding fills the screen with the focused window — and brings it back.",
+    steps: [
+      {
+        say: "Make the focused window fill the whole screen.",
+        bind: "Full screen",
+        await: { event: "fullscreen", data: "^1$" },
+        spotlight: null
+      },
+      {
+        say: "Now bring it back to its place in the grid.",
+        bind: "Full screen",
+        await: { event: "fullscreen", data: "^0$" },
+        spotlight: null
+      }
+    ]
+  },
+  {
+    id: "scratchpad",
+    title: "Stash windows in the scratchpad",
+    keywords: ["scratchpad", "stash", "special", "hide", "music", "notes"],
+    intro: "The scratchpad is a hidden workspace you can summon anywhere — great for music players and notes.",
+    steps: [
+      {
+        say: "Send the focused window to the scratchpad.",
+        bind: "Move window to scratchpad",
+        await: { event: "movewindow", data: ",special:scratchpad$" },
+        spotlight: null
+      },
+      {
+        say: "Summon the scratchpad to see it again.",
+        bind: "Toggle scratchpad",
+        await: { event: "activespecial", data: "^special:scratchpad," },
+        spotlight: null
+      },
+      {
+        say: "And tuck it away.",
+        bind: "Toggle scratchpad",
+        await: { event: "activespecial", data: "^," },
+        spotlight: null
+      }
+    ]
+  },
+  {
+    id: "omarchy-menu",
+    title: "Open the Omarchy menu",
+    keywords: ["menu", "omarchy", "settings", "launcher", "everything"],
+    intro: "The Omarchy menu is the front door to apps, capture, themes, and system controls.",
+    steps: [
+      {
+        say: "Open the Omarchy menu.",
+        bind: "Omarchy menu",
+        await: { event: "openlayer", data: "^omarchy-menu$" },
+        spotlight: null
+      },
+      {
+        say: "Have a look around, then close it with Esc.",
+        bind: null,
+        await: { event: "closelayer", data: "^omarchy-menu$" },
+        spotlight: null
+      }
+    ]
+  },
+  {
+    id: "emojis",
+    title: "Type an emoji",
+    keywords: ["emoji", "emojis", "picker", "symbols"],
+    intro: "A searchable emoji picker lives one keybinding away.",
+    steps: [
+      {
+        say: "Open the emoji picker.",
+        bind: "Emojis",
+        await: { event: "openlayer", data: "^omarchy-emojis$" },
+        spotlight: null
+      },
+      {
+        say: "Search one and pick it with Enter — or close with Esc.",
+        bind: null,
+        await: { event: "closelayer", data: "^omarchy-emojis$" },
+        spotlight: null
+      }
+    ]
+  },
+  {
+    id: "clipboard",
+    title: "Use the clipboard manager",
+    keywords: ["clipboard", "copy", "paste", "history"],
+    intro: "Everything you copy is kept in a searchable history.",
+    steps: [
+      {
+        say: "Open the clipboard manager.",
+        bind: "Clipboard manager",
+        await: { event: "openlayer", data: "^omarchy-clipboard$" },
+        spotlight: null
+      },
+      {
+        say: "Pick an entry with Enter to paste it — or close with Esc.",
+        bind: null,
+        await: { event: "closelayer", data: "^omarchy-clipboard$" },
+        spotlight: null
+      }
+    ]
   }
 ]
 

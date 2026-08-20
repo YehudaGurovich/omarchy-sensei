@@ -69,11 +69,13 @@ desktop keeps keyboard focus, so you perform every step for real.
 
 ## Status
 
-Version 0.3.0 — the walkthrough engine works end to end: live key
+Version 0.4.0 — the walkthrough engine works end to end: live key
 resolution (including Lua `code:` binds via the compiled keymap),
 event-driven step completion (multi-monitor aware), spotlight highlighting,
-persistent progress and belts, the welcome tour, and the coach card.
-Next: more lessons. See `PLAN.md`.
+persistent progress and belts, and the coach card. Ten lessons: the welcome
+tour, workspaces, moving windows, terminal, float/tile, fullscreen,
+scratchpad, the Omarchy menu, emojis, and the clipboard manager — every
+step verified against real compositor events. See `PLAN.md`.
 
 ## License
 
