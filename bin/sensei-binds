@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+# Emits the user's Hyprland keybindings as TSV: modmask<TAB>description<TAB>key
+#
+# Hyprland's Lua config provider reports Lua binds as dispatcher __lua and
+# loses the key for code: bindings in `hyprctl binds`. This scan executes the
+# user's real config entry point in a sandboxed Lua and records hl.bind calls,
+# then resolves keycodes to symbols via the compiled keymap. The approach
+# mirrors Omarchy's own omarchy-menu-keybindings (MIT).
+set -euo pipefail
+
+command -v lua >/dev/null 2>&1 || exit 0
+
+resolve_keycodes() {
+  awk '
+    BEGIN {
+      split("10=1 11=2 12=3 13=4 14=5 15=6 16=7 17=8 18=9 19=0 20=MINUS 21=EQUAL 59=COMMA 60=PERIOD 61=SLASH", fallbacks, " ")
+      for (i in fallbacks) {
+        separator = index(fallbacks[i], "=")
+        keycode_symbol[substr(fallbacks[i], 1, separator - 1)] = substr(fallbacks[i], separator + 1)
+      }
+
+      # </dev/null keeps xkbcli from consuming the binding records on stdin
+      keymap_cmd = "xkbcli compile-keymap </dev/null"
+      section = ""
+      while ((keymap_cmd | getline line) > 0) {
+        if (line ~ /xkb_keycodes/) { section = "codes"; continue }
+        if (line ~ /xkb_symbols/)  { section = "syms";  continue }
+        if (section == "codes" && match(line, /<([A-Za-z0-9_]+)>\s*=\s*([0-9]+)\s*;/, m)) code_by_name[m[1]] = m[2]
+        if (section == "syms" && match(line, /key\s*<([A-Za-z0-9_]+)>\s*\{\s*\[\s*([^, \]]+)/, m)) sym_by_name[m[1]] = m[2]
+      }
+      close(keymap_cmd)
+
+      for (name in code_by_name) {
+        code = code_by_name[name]
+        symbol = sym_by_name[name]
+        if (code != "" && symbol != "" && symbol != "NoSymbol") keycode_symbol[code] = toupper(symbol)
+      }
+
+      mouse_symbol["272"] = "LEFT MOUSE BUTTON"
+      mouse_symbol["273"] = "RIGHT MOUSE BUTTON"
+      mouse_symbol["274"] = "MIDDLE MOUSE BUTTON"
+    }
+    {
+      if (match($0, /code:([0-9]+)/, match_parts)) {
+        code = match_parts[1]
+        symbol = keycode_symbol[code]
+        if (symbol == "") symbol = "code:" code
+        sub("code:" code, symbol)
+      } else if (match($0, /mouse:([0-9]+)/, match_parts)) {
+        code = match_parts[1]
+        symbol = mouse_symbol[code]
+        if (symbol == "") symbol = "mouse:" code
+        sub("mouse:" code, symbol)
+      }
+
+      print
+    }
+  '
+}
+
+lua <<'LUA' | resolve_keycodes
+local modifiers = { SHIFT = 1, CTRL = 4, CONTROL = 4, ALT = 8, SUPER = 64 }
+
+local function split_keys(keys)
+  local modmask = 0
+  local key = ""
+
+  for part in string.gmatch(tostring(keys or ""), "[^+]+") do
+    local value = part:gsub("^%s+", ""):gsub("%s+$", "")
+    local modifier = modifiers[string.upper(value)]
+
+    if modifier then
+      modmask = modmask + modifier
+    else
+      key = value
+    end
+  end
+
+  return modmask, key
+end
+
+local function dispatcher(kind, arg)
+  return {
+    __omarchy_dispatcher = true,
+    kind = kind or "",
+    arg = arg or "",
+    expr = "",
+  }
+end
+
+local function dsp_proxy(path)
+  return setmetatable({ path = path }, {
+    __index = function(self, key)
+      return dsp_proxy(self.path .. "." .. tostring(key))
+    end,
+    __call = function(self, ...)
+      local first_arg = ...
+
+      if self.path == "hl.dsp.exec_cmd" and type(first_arg) == "string" then
+        return dispatcher("exec", first_arg)
+      end
+
+      return dispatcher("lua", "")
+    end,
+  })
+end
+
+local noop
+noop = setmetatable({}, {
+  __index = function()
+    return noop
+  end,
+  __call = function()
+    return noop
+  end,
+})
+
+hl = setmetatable({
+  dsp = dsp_proxy("hl.dsp"),
+  bind = function(keys, bind_dispatcher, opts)
+    opts = opts or {}
+
+    if opts.description and opts.description ~= "" then
+      local modmask, key = split_keys(keys)
+      print(table.concat({ tostring(modmask), opts.description, key }, "\t"))
+    end
+
+    return noop
+  end,
+  get_config = function()
+    return nil
+  end,
+}, {
+  __index = function()
+    return noop
+  end,
+})
+
+local config = os.getenv("HOME") .. "/.config/hypr/hyprland.lua"
+local file = io.open(config, "r")
+
+if file then
+  file:close()
+  pcall(dofile, config)
+end
+LUA

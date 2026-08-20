@@ -1,21 +1,24 @@
-// Sensei lesson data — schema v0.
+// Sensei lesson data — schema v1.
 //
 // Lesson:
 //   id        unique slug
 //   title     shown in the browser list
 //   keywords  extra search terms
-//   intro     one-line summary shown before the first step
+//   intro     one-line summary (reserved for the lesson intro card)
 //   steps     ordered list of Step
 //
 // Step:
-//   say        instruction text; "{key}" is replaced with the user's live
-//              keybinding resolved from `hyprctl binds -j` by description
-//   bind       description string to look up in the user's active binds
-//   await      completion signal from the Hyprland event socket:
+//   say        plain instruction text; the resolved keycaps render below it
+//   bind       keybinding description resolved from the user's live config
+//              (bin/sensei-binds + hyprctl) — never a hardcoded key
+//   await      completion signal from the Hyprland event socket. One object
+//              or an array of alternatives (any match completes the step):
 //                { event: "workspace", data: "^2$" }
-//              null means the step shows a manual Next button
-//   spotlight  "bar" | null — layer surface to highlight (resolved via
-//              `hyprctl layers -j`, degrades to no spotlight if absent)
+//              On multi-monitor setups, focusing a workspace that is already
+//              visible on another monitor emits focusedmon ("MONITOR,WS")
+//              instead of workspace, so workspace steps await both.
+//              null means the step only offers the manual skip button.
+//   spotlight  "bar" | null — layer surface to highlight (Day 2)
 
 var LESSONS = [
   {
@@ -25,21 +28,30 @@ var LESSONS = [
     intro: "Workspaces are numbered desktops. You can jump to any of them directly.",
     steps: [
       {
-        say: "Press {key} to jump to workspace 2.",
-        bind: "Workspace 2",
-        await: { event: "workspace", data: "^2$" },
+        say: "Jump to workspace 2.",
+        bind: "Switch to workspace 2",
+        await: [
+          { event: "workspace", data: "^2$" },
+          { event: "focusedmon", data: ",2$" }
+        ],
         spotlight: "bar"
       },
       {
-        say: "Now press {key} to come back to workspace 1.",
-        bind: "Workspace 1",
-        await: { event: "workspace", data: "^1$" },
+        say: "Now come back to workspace 1.",
+        bind: "Switch to workspace 1",
+        await: [
+          { event: "workspace", data: "^1$" },
+          { event: "focusedmon", data: ",1$" }
+        ],
         spotlight: "bar"
       },
       {
-        say: "Press {key} to bounce back to the workspace you came from.",
+        say: "Bounce back to the workspace you came from.",
         bind: "Former workspace",
-        await: { event: "workspace", data: ".*" },
+        await: [
+          { event: "workspace", data: ".*" },
+          { event: "focusedmon", data: ".*" }
+        ],
         spotlight: null
       }
     ]
@@ -51,15 +63,23 @@ var LESSONS = [
     intro: "You can carry the focused window with you, or send it away silently.",
     steps: [
       {
-        say: "Press {key} to move this window to workspace 3 and follow it.",
+        say: "Carry this window to workspace 3 — you travel with it.",
         bind: "Move window to workspace 3",
-        await: { event: "workspace", data: "^3$" },
+        await: [
+          { event: "movewindow", data: ",3$" },
+          { event: "workspace", data: "^3$" },
+          { event: "focusedmon", data: ",3$" }
+        ],
         spotlight: null
       },
       {
-        say: "Bring it back: press {key} to move it to workspace 1.",
+        say: "Bring it home: move it back to workspace 1.",
         bind: "Move window to workspace 1",
-        await: { event: "workspace", data: "^1$" },
+        await: [
+          { event: "movewindow", data: ",1$" },
+          { event: "workspace", data: "^1$" },
+          { event: "focusedmon", data: ",1$" }
+        ],
         spotlight: null
       }
     ]
@@ -71,7 +91,7 @@ var LESSONS = [
     intro: "Omarchy launches your default terminal with one keybinding.",
     steps: [
       {
-        say: "Press {key} to open a new terminal window.",
+        say: "Open a new terminal window.",
         bind: "Terminal",
         await: { event: "openwindow", data: ".*" },
         spotlight: null

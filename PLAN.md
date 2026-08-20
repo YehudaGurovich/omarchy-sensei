@@ -22,9 +22,20 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
 
 ## Day plan
 
-- **Day 1 (Thu Aug 21):** walkthrough engine — bind resolver (`hyprctl binds -j`
-  via Quickshell Process), socket2 event listener, step state machine,
-  step card UI replacing the placeholder detail view.
+- **Day 1 — DONE (Aug 20):** walkthrough engine — bind resolver, Hyprland
+  event listener, step state machine, coach card UI, dojo theming (penguin
+  mascot, belts, praise lines), IPC routes (`sensei start/status/end`).
+  Verified end to end against the live compositor.
+  Findings that changed the design:
+  - Hyprland's Lua config provider hides keys for `code:` binds in
+    `hyprctl binds -j` (59 binds affected). Fix: `bin/sensei-binds` executes
+    the user's real config entry point in a sandboxed Lua and resolves
+    keycodes through the compiled keymap (approach mirrors Omarchy's own
+    omarchy-menu-keybindings). hyprctl stays as fallback.
+  - Multi-monitor: focusing a workspace already visible on another monitor
+    emits `focusedmon`, not `workspace`. Steps now await alternative events.
+  - Untested so far: move-window and open-terminal lessons (same await
+    mechanism, but not yet exercised end to end).
 - **Day 2 (Fri Aug 22):** spotlight overlay (scrim with cutout, layer geometry),
   manual-Next fallback, lesson completion state, welcome tour trigger.
 - **Day 3 (Sat Aug 23):** content — 8–12 lessons covering workspaces, window
@@ -42,6 +53,15 @@ omarchy-shell shell toggle io.github.yehudagurovich.sensei '{}'
 ```
 
 Logs: `qs log` workflow.
+
+## Ideas backlog
+
+- **Omarchy points / sensei ranks:** award points per completed lesson,
+  weighted by difficulty (each lesson gets a difficulty field). Points feed a
+  rank progression from grasshopper to sensei alongside the belt colors, so
+  advanced lessons (submaps, window groups, scripting) are worth more than
+  basics. Local-only. Design the Day 2 progress.json with a points field so
+  this can land without a schema change.
 
 ## Open questions
 

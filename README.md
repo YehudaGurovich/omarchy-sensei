@@ -49,11 +49,20 @@ Lessons are plain data in `lessons/lessons.js`. Each step declares:
 
 Contributions of new lessons are welcome.
 
+## The dojo
+
+Sensei is a penguin master with a white beard and a red headband. Completing
+lessons raises your belt rank, from white belt toward black belt. Your
+training happens in a compact coach card in the corner of the screen — the
+desktop keeps keyboard focus, so you perform every step for real.
+
 ## Status
 
-Version 0.1.0 — lesson browser and lesson format. The guided walkthrough
-engine (live key resolution, event detection, spotlight overlay) is under
-active development. See `PLAN.md`.
+Version 0.2.0 — the walkthrough engine works end to end: live key
+resolution (including Lua `code:` binds via the compiled keymap),
+event-driven step completion (multi-monitor aware), belts, and the coach
+card. Next: spotlight highlighting, persistent progress, and more lessons.
+See `PLAN.md`.
 
 ## License
 
