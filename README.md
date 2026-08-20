@@ -69,7 +69,7 @@ desktop keeps keyboard focus, so you perform every step for real.
 
 ## Status
 
-Version 0.4.0 — the walkthrough engine works end to end: live key
+Version 1.0.0 — the walkthrough engine works end to end: live key
 resolution (including Lua `code:` binds via the compiled keymap),
 event-driven step completion (multi-monitor aware), spotlight highlighting,
 persistent progress and belts, and the coach card. Ten lessons: the welcome
