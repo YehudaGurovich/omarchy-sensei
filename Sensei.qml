@@ -23,9 +23,11 @@ Item {
   // Walkthrough state
   property var lesson: null
   property int stepIndex: 0
-  property string phase: "idle" // idle | await | flash | complete
+  property string phase: "idle" // idle | await | complete
   property var stepCaps: []
   property bool stepBindFound: true
+  property string praiseText: ""
+  property bool skipUsed: false
   property var completedIds: [] // in-memory for now; persistence lands with Day 2
 
   // Shares the [menu] surface tokens so every Omarchy theme styles Sensei.
@@ -119,6 +121,9 @@ Item {
     root.phase = "await"
     root.stepCaps = []
     root.stepBindFound = true
+    root.skipUsed = false
+    root.praiseText = ""
+    praiseTimer.stop()
     binds.refresh()
     console.log("sensei: lesson start " + lessonData.id)
   }
@@ -137,38 +142,38 @@ Item {
     if (!r.found) console.log("sensei: no binding found for \"" + step.bind + "\"")
   }
 
-  function stepComplete() {
+  // viaButton distinguishes the manual button from a detected event. It only
+  // counts as a skip when the step had a detectable event to wait for —
+  // manual-only steps (await: null) advance by button by design. A skipped
+  // step means the lesson is finished but not mastered: no belt credit.
+  function stepComplete(viaButton) {
     if (!root.lesson || root.phase !== "await") return
+    var step = root.currentStep()
+    if (viaButton && step && step.await) root.skipUsed = true
     console.log("sensei: step " + (root.stepIndex + 1) + "/" + root.lesson.steps.length + " complete")
     if (root.stepIndex + 1 >= root.lesson.steps.length) {
-      if (root.completedIds.indexOf(root.lesson.id) === -1)
+      if (!root.skipUsed && root.completedIds.indexOf(root.lesson.id) === -1)
         root.completedIds = root.completedIds.concat([root.lesson.id])
       root.phase = "complete"
     } else {
-      root.phase = "flash"
-      flashTimer.restart()
+      root.praiseText = "✓  " + Dojo.praise(root.stepIndex)
+      praiseTimer.restart()
+      root.stepIndex += 1
+      root.applyStep()
     }
-  }
-
-  function advanceStep() {
-    root.stepIndex += 1
-    root.phase = "await"
-    root.applyStep()
   }
 
   function endLesson() {
     root.lesson = null
     root.phase = "idle"
-  }
-
-  function backToDojo() {
-    root.openBrowser()
+    root.praiseText = ""
+    praiseTimer.stop()
   }
 
   Timer {
-    id: flashTimer
-    interval: 900
-    onTriggered: root.advanceStep()
+    id: praiseTimer
+    interval: 1400
+    onTriggered: root.praiseText = ""
   }
 
   BindResolver {
@@ -192,7 +197,7 @@ Item {
         if (name !== awaits[i].event) continue
         var re
         try { re = new RegExp(awaits[i].data) } catch (e) { continue }
-        if (re.test(data)) { root.stepComplete(); return }
+        if (re.test(data)) { root.stepComplete(false); return }
       }
     }
   }
@@ -216,8 +221,14 @@ Item {
         phase: root.phase,
         caps: root.stepCaps,
         bindFound: root.stepBindFound,
+        skipUsed: root.skipUsed,
         completed: root.completedIds
       })
+    }
+
+    function skip(): string {
+      root.stepComplete(true)
+      return "skipped"
     }
 
     function end(): string {
@@ -254,6 +265,30 @@ Item {
       anchors.fill: parent
       hoverEnabled: true
       onClicked: button.clicked()
+    }
+  }
+
+  component BeltBadge: Row {
+    property string label: ""
+    spacing: Style.spacing.md
+
+    Rectangle {
+      width: Style.space(12)
+      height: Style.space(12)
+      radius: Style.space(6)
+      anchors.verticalCenter: parent.verticalCenter
+      color: Dojo.beltFor(root.completedIds.length).color
+      border.color: root.border
+      border.width: 1
+    }
+
+    Text {
+      anchors.verticalCenter: parent.verticalCenter
+      text: parent.label
+      color: root.foreground
+      opacity: 0.7
+      font.family: root.fontFamily
+      font.pixelSize: root.smallFont
     }
   }
 
@@ -322,8 +357,8 @@ Item {
             if (root.filterText) root.setFilter("")
             else root.dismiss()
             event.accepted = true
-          } else if (event.key === Qt.Key_Backspace) {
-            root.setFilter(root.filterText.slice(0, -1))
+          } else if (Util.editsFilter(event, root.filterText)) {
+            root.setFilter(Util.editedFilter(event, root.filterText))
             event.accepted = true
           } else if (event.key === Qt.Key_Up) {
             root.select(-1)
@@ -414,31 +449,12 @@ Item {
           }
         }
 
-        Row {
+        BeltBadge {
           id: beltRow
           width: parent.width
           height: Math.max(Style.space(20), root.smallFont + Style.spacing.controlPaddingY)
-          spacing: Style.spacing.md
-
-          Rectangle {
-            width: Style.space(12)
-            height: Style.space(12)
-            radius: Style.space(6)
-            anchors.verticalCenter: parent.verticalCenter
-            color: Dojo.beltFor(root.completedIds.length).color
-            border.color: root.border
-            border.width: 1
-          }
-
-          Text {
-            anchors.verticalCenter: parent.verticalCenter
-            text: Dojo.beltFor(root.completedIds.length).name + " · "
-              + root.completedIds.length + " of " + Lessons.all().length + " lessons mastered"
-            color: root.foreground
-            opacity: 0.65
-            font.family: root.fontFamily
-            font.pixelSize: root.smallFont
-          }
+          label: Dojo.beltFor(root.completedIds.length).name + " · "
+            + root.completedIds.length + " of " + Lessons.all().length + " lessons mastered"
         }
       }
     }
@@ -520,6 +536,28 @@ Item {
 
         Text {
           width: parent.width
+          visible: root.phase === "await" && root.stepIndex === 0 && !!root.lesson && !!root.lesson.intro
+          text: root.lesson ? root.lesson.intro : ""
+          color: root.foreground
+          opacity: 0.6
+          font.family: root.fontFamily
+          font.pixelSize: root.smallFont
+          wrapMode: Text.WordWrap
+        }
+
+        Text {
+          width: parent.width
+          visible: root.phase === "await" && !!root.praiseText
+          text: root.praiseText
+          color: root.foreground
+          opacity: 0.8
+          font.family: root.fontFamily
+          font.pixelSize: root.smallFont
+          wrapMode: Text.WordWrap
+        }
+
+        Text {
+          width: parent.width
           visible: root.phase === "await"
           text: {
             var step = root.currentStep()
@@ -553,16 +591,6 @@ Item {
           wrapMode: Text.WordWrap
         }
 
-        Text {
-          width: parent.width
-          visible: root.phase === "flash"
-          text: "✓  " + Dojo.praise(root.stepIndex)
-          color: root.foreground
-          font.family: root.fontFamily
-          font.pixelSize: Style.font.body
-          wrapMode: Text.WordWrap
-        }
-
         Column {
           width: parent.width
           visible: root.phase === "complete"
@@ -570,34 +598,17 @@ Item {
 
           Text {
             width: parent.width
-            text: "Lesson mastered. " + Dojo.praise(root.stepIndex)
+            text: root.skipUsed
+              ? "Lesson finished. Skipped steps are not mastered — run it again to earn the belt."
+              : "Lesson mastered. " + Dojo.praise(root.stepIndex)
             color: root.foreground
             font.family: root.fontFamily
             font.pixelSize: Style.font.body
             wrapMode: Text.WordWrap
           }
 
-          Row {
-            spacing: Style.spacing.md
-
-            Rectangle {
-              width: Style.space(12)
-              height: Style.space(12)
-              radius: Style.space(6)
-              anchors.verticalCenter: parent.verticalCenter
-              color: Dojo.beltFor(root.completedIds.length).color
-              border.color: root.border
-              border.width: 1
-            }
-
-            Text {
-              anchors.verticalCenter: parent.verticalCenter
-              text: "Rank: " + Dojo.beltFor(root.completedIds.length).name
-              color: root.foreground
-              opacity: 0.75
-              font.family: root.fontFamily
-              font.pixelSize: root.smallFont
-            }
+          BeltBadge {
+            label: "Rank: " + Dojo.beltFor(root.completedIds.length).name
           }
         }
 
@@ -624,14 +635,17 @@ Item {
 
           CoachButton {
             visible: root.phase === "await"
-            label: "Skip step"
-            onClicked: root.stepComplete()
+            label: {
+              var step = root.currentStep()
+              return step && !step.await ? "Next" : "Skip step"
+            }
+            onClicked: root.stepComplete(true)
           }
 
           CoachButton {
             visible: root.phase === "complete"
             label: "Return to dojo"
-            onClicked: root.backToDojo()
+            onClicked: root.openBrowser()
           }
 
           CoachButton {

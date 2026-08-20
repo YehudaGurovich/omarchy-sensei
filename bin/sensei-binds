@@ -10,6 +10,7 @@ set -euo pipefail
 
 command -v lua >/dev/null 2>&1 || exit 0
 
+# Uses gawk's 3-argument match(); Omarchy/Arch ship gawk as awk.
 resolve_keycodes() {
   awk '
     BEGIN {
@@ -36,9 +37,6 @@ resolve_keycodes() {
         if (code != "" && symbol != "" && symbol != "NoSymbol") keycode_symbol[code] = toupper(symbol)
       }
 
-      mouse_symbol["272"] = "LEFT MOUSE BUTTON"
-      mouse_symbol["273"] = "RIGHT MOUSE BUTTON"
-      mouse_symbol["274"] = "MIDDLE MOUSE BUTTON"
     }
     {
       if (match($0, /code:([0-9]+)/, match_parts)) {
@@ -46,11 +44,6 @@ resolve_keycodes() {
         symbol = keycode_symbol[code]
         if (symbol == "") symbol = "code:" code
         sub("code:" code, symbol)
-      } else if (match($0, /mouse:([0-9]+)/, match_parts)) {
-        code = match_parts[1]
-        symbol = mouse_symbol[code]
-        if (symbol == "") symbol = "mouse:" code
-        sub("mouse:" code, symbol)
       }
 
       print
@@ -79,11 +72,13 @@ local function split_keys(keys)
   return modmask, key
 end
 
-local function dispatcher(kind, arg)
+-- hl.dsp calls must return string-safe fields: Omarchy's own bind wrappers
+-- may read .kind/.arg/.expr off the dispatcher result and concatenate them.
+local function dispatcher()
   return {
     __omarchy_dispatcher = true,
-    kind = kind or "",
-    arg = arg or "",
+    kind = "",
+    arg = "",
     expr = "",
   }
 end
@@ -93,14 +88,8 @@ local function dsp_proxy(path)
     __index = function(self, key)
       return dsp_proxy(self.path .. "." .. tostring(key))
     end,
-    __call = function(self, ...)
-      local first_arg = ...
-
-      if self.path == "hl.dsp.exec_cmd" and type(first_arg) == "string" then
-        return dispatcher("exec", first_arg)
-      end
-
-      return dispatcher("lua", "")
+    __call = function()
+      return dispatcher()
     end,
   })
 end

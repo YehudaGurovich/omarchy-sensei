@@ -17,7 +17,9 @@
 //              On multi-monitor setups, focusing a workspace that is already
 //              visible on another monitor emits focusedmon ("MONITOR,WS")
 //              instead of workspace, so workspace steps await both.
-//              null means the step only offers the manual skip button.
+//              Keep patterns as tight as the event data allows — a loose
+//              pattern lets unrelated activity complete the step.
+//              null means the step advances only with the manual Next button.
 //   spotlight  "bar" | null — layer surface to highlight (Day 2)
 
 var LESSONS = [
@@ -46,11 +48,12 @@ var LESSONS = [
         spotlight: "bar"
       },
       {
+        // The lesson flow guarantees the former workspace here is 2.
         say: "Bounce back to the workspace you came from.",
         bind: "Former workspace",
         await: [
-          { event: "workspace", data: ".*" },
-          { event: "focusedmon", data: ".*" }
+          { event: "workspace", data: "^2$" },
+          { event: "focusedmon", data: ",2$" }
         ],
         spotlight: null
       }
@@ -63,23 +66,17 @@ var LESSONS = [
     intro: "You can carry the focused window with you, or send it away silently.",
     steps: [
       {
+        // movewindow fires only when a window actually moves ("ADDRESS,WS"),
+        // so merely switching workspaces cannot complete the step.
         say: "Carry this window to workspace 3 — you travel with it.",
         bind: "Move window to workspace 3",
-        await: [
-          { event: "movewindow", data: ",3$" },
-          { event: "workspace", data: "^3$" },
-          { event: "focusedmon", data: ",3$" }
-        ],
+        await: { event: "movewindow", data: ",3$" },
         spotlight: null
       },
       {
         say: "Bring it home: move it back to workspace 1.",
         bind: "Move window to workspace 1",
-        await: [
-          { event: "movewindow", data: ",1$" },
-          { event: "workspace", data: "^1$" },
-          { event: "focusedmon", data: ",1$" }
-        ],
+        await: { event: "movewindow", data: ",1$" },
         spotlight: null
       }
     ]
@@ -91,9 +88,14 @@ var LESSONS = [
     intro: "Omarchy launches your default terminal with one keybinding.",
     steps: [
       {
+        // openwindow data is "ADDRESS,WS,CLASS,TITLE"; match the class of
+        // common terminals so an unrelated window cannot complete the step.
         say: "Open a new terminal window.",
         bind: "Terminal",
-        await: { event: "openwindow", data: ".*" },
+        await: {
+          event: "openwindow",
+          data: "^[^,]*,[^,]*,([Aa]lacritty|foot|footclient|kitty|com\\.mitchellh\\.ghostty|ghostty|org\\.wezfurlong\\.wezterm|wezterm|[Kk]onsole|[Ss]t|[Xx]term),"
+        },
         spotlight: null
       }
     ]

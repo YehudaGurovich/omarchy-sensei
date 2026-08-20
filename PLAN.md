@@ -34,8 +34,14 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
     omarchy-menu-keybindings). hyprctl stays as fallback.
   - Multi-monitor: focusing a workspace already visible on another monitor
     emits `focusedmon`, not `workspace`. Steps now await alternative events.
-  - Untested so far: move-window and open-terminal lessons (same await
-    mechanism, but not yet exercised end to end).
+  - Untested so far: the move-window lesson (same await mechanism, but not
+    yet exercised end to end).
+  - Post-review cleanup: praise now shows transiently while the next step is
+    already live (no gated flash phase, no stale timer); skipping a step
+    finishes the lesson without belt credit; awaits tightened (movewindow
+    only for moves, terminal class match for openwindow, deterministic
+    former-workspace target); resolver merged into one map lookup with
+    user-override-wins semantics.
 - **Day 2 (Fri Aug 22):** spotlight overlay (scrim with cutout, layer geometry),
   manual-Next fallback, lesson completion state, welcome tour trigger.
 - **Day 3 (Sat Aug 23):** content — 8–12 lessons covering workspaces, window

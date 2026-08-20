@@ -11,8 +11,9 @@ import QtQuick
 Item {
   id: root
 
-  property var luaBinds: []
-  property var hyprctlBinds: []
+  // description (lowercased) -> { modmask, key }
+  property var luaMap: ({})
+  property var hyprctlMap: ({})
   property bool ready: false
   signal loaded()
 
@@ -39,28 +40,12 @@ Item {
     return k
   }
 
-  // Returns { found, caps: ["SUPER", "3"], submap }
+  // Returns { found, caps: ["SUPER", "3"] }
   function resolve(description) {
     var want = String(description || "").trim().toLowerCase()
-
-    // Last match wins: the config executes defaults first, user files after,
-    // so a user override shadows the default binding.
-    for (var i = root.luaBinds.length - 1; i >= 0; i--) {
-      var lb = root.luaBinds[i]
-      if (lb.description.toLowerCase() !== want || !lb.key) continue
-      return { found: true, caps: modNames(lb.modmask).concat([displayKey(lb.key)]), submap: "" }
-    }
-
-    for (var j = 0; j < root.hyprctlBinds.length; j++) {
-      var hb = root.hyprctlBinds[j]
-      if (String(hb.description || "").trim().toLowerCase() !== want) continue
-      var key = String(hb.key || "")
-      if (!key && hb.keycode) key = "code:" + hb.keycode
-      if (!key) continue
-      return { found: true, caps: modNames(hb.modmask).concat([displayKey(key)]), submap: String(hb.submap || "") }
-    }
-
-    return { found: false, caps: [], submap: "" }
+    var entry = root.luaMap[want] || root.hyprctlMap[want]
+    if (!entry) return { found: false, caps: [] }
+    return { found: true, caps: modNames(entry.modmask).concat([displayKey(entry.key)]) }
   }
 
   Process {
@@ -71,14 +56,16 @@ Item {
     stdout: StdioCollector {
       waitForEnd: true
       onStreamFinished: {
-        var parsed = []
+        // The config executes defaults first and user files after, so later
+        // lines overwrite earlier ones and a user override wins.
+        var map = {}
         var lines = String(text || "").split("\n")
         for (var i = 0; i < lines.length; i++) {
           var parts = lines[i].split("\t")
-          if (parts.length < 3) continue
-          parsed.push({ modmask: parseInt(parts[0], 10) || 0, description: parts[1], key: parts[2] })
+          if (parts.length < 3 || !parts[2]) continue
+          map[parts[1].trim().toLowerCase()] = { modmask: parseInt(parts[0], 10) || 0, key: parts[2] }
         }
-        root.luaBinds = parsed
+        root.luaMap = map
         root.ready = true
         root.loaded()
       }
@@ -93,11 +80,23 @@ Item {
     stdout: StdioCollector {
       waitForEnd: true
       onStreamFinished: {
+        var binds = []
         try {
-          root.hyprctlBinds = JSON.parse(text)
+          binds = JSON.parse(text)
         } catch (e) {
-          root.hyprctlBinds = []
+          binds = []
         }
+        var map = {}
+        for (var i = 0; i < binds.length; i++) {
+          var b = binds[i]
+          var desc = String(b.description || "").trim().toLowerCase()
+          if (!desc || map[desc]) continue
+          var key = String(b.key || "")
+          if (!key && b.keycode) key = "code:" + b.keycode
+          if (!key) continue
+          map[desc] = { modmask: b.modmask, key: key }
+        }
+        root.hyprctlMap = map
         if (root.ready) root.loaded()
       }
     }

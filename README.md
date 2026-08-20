@@ -8,14 +8,18 @@ actually do it before moving on — like a game tutorial for your window manager
 
 ## Why it is different
 
-- **It reads your config, not the defaults.** Lessons resolve keybindings live
-  from `hyprctl binds -j`, so Sensei always shows *your* keys — even if you
-  rebound everything.
+- **It reads your config, not the defaults.** Keybindings resolve live from
+  your real Hyprland config: a sandboxed scan of your config entry point plus
+  your compiled keymap (`bin/sensei-binds`), with `hyprctl binds -j` as
+  fallback. Sensei always shows *your* keys — even if you rebound everything.
 - **It verifies by results, not keypresses.** Steps complete when the real
-  compositor event fires (workspace changed, window opened). Use a key, a
-  menu, or the mouse — if you did the thing, you advance.
-- **It degrades gracefully.** No matching keybinding, a replaced bar, an
-  exotic setup — every lesson still works, down to a manual "Next" button.
+  compositor event fires (workspace changed, window moved, terminal opened).
+  Use a key, a menu, or the mouse — if you did the thing, you advance.
+  Skipped steps do not count: belts are earned, not clicked.
+- **It degrades gracefully.** No matching keybinding or an exotic setup —
+  every step still works: undetectable steps advance with a Next button, and
+  any step can be skipped. (Spotlight highlighting of screen regions is the
+  next rung, in development.)
 
 ## Install
 
@@ -35,24 +39,28 @@ Bind it to a key for quick access.
 
 1. Open Sensei — a search palette appears.
 2. Type what you want to learn ("move window", "terminal", "workspace").
-3. Pick a lesson and follow the steps on your live desktop.
-4. `Esc` goes back; `Esc` again closes.
+3. Pick a lesson and follow the steps on your live desktop. During a
+   walkthrough the desktop keeps keyboard focus — use the coach card's
+   buttons to skip a step or end the lesson.
+4. In the palette, `Esc` clears the search; `Esc` again closes.
 
 ## Lessons
 
 Lessons are plain data in `lessons/lessons.js`. Each step declares:
 
-- `say` — the instruction, with `{key}` replaced by your live keybinding
+- `say` — the instruction; your live keybinding renders as keycaps below it
 - `bind` — the keybinding description to resolve from your active config
-- `await` — the Hyprland event that proves you did it
-- `spotlight` — an optional screen region to highlight
+- `await` — the Hyprland event (or alternatives) that proves you did it;
+  `null` makes the step advance with a manual Next button
+- `spotlight` — reserved: a screen region to highlight (in development)
 
 Contributions of new lessons are welcome.
 
 ## The dojo
 
 Sensei is a penguin master with a white beard and a red headband. Completing
-lessons raises your belt rank, from white belt toward black belt. Your
+lessons — without skipping steps — raises your belt rank, from white belt
+toward black belt. Your
 training happens in a compact coach card in the corner of the screen — the
 desktop keeps keyboard focus, so you perform every step for real.
 
