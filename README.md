@@ -35,6 +35,19 @@ omarchy-shell shell toggle io.github.yehudagurovich.sensei '{}'
 
 Bind it to a key for quick access.
 
+## Requirements
+
+Everything Sensei uses ships with Omarchy Quattro: `hyprctl`, `bash`,
+`gawk`, `lua`, and `xkbcli` (libxkbcommon). No extra installs, no
+configuration changes — Sensei only reads your config and writes its own
+progress file under `~/.local/state/omarchy-sensei/`.
+
+Remove with:
+
+```sh
+omarchy plugin remove io.github.yehudagurovich.sensei
+```
+
 ## Usage
 
 1. Open Sensei — a search palette appears.

@@ -29,10 +29,11 @@ Planned listing:
 
 ## Checklist before submitting
 
-- [ ] Walkthrough engine works end to end on a default Omarchy install
+- [x] Walkthrough engine works end to end (verified on this machine; a pristine-default VM run was not done — bind resolution reads the live config by design)
 - [x] 8–12 polished lessons, welcome tour chains the basics (10 lessons, all verified)
-- [ ] `omarchy plugin validate` passes
-- [ ] Fresh install test: `omarchy plugin add <repo-url> --enable` on a clean setup
-- [ ] `preview.png` (screenshot or short GIF-derived frame) in the repo
-- [ ] README install command matches the final repo URL
-- [ ] Version bumped, repo public, submitted via the form
+- [x] `omarchy plugin validate` passes
+- [x] Fresh install test: installed and smoke-tested from the public GitHub URL
+- [x] `preview.png` (welcome tour with spotlight) in the repo
+- [x] README install command matches the final repo URL
+- [x] Version 1.0.0, repo public
+- [ ] Submitted via the marketplace form
