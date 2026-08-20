@@ -9,9 +9,10 @@ actually do it before moving on — like a game tutorial for your window manager
 ## Why it is different
 
 - **It reads your config, not the defaults.** Keybindings resolve live from
-  your real Hyprland config: a sandboxed scan of your config entry point plus
-  your compiled keymap (`bin/sensei-binds`), with `hyprctl binds -j` as
-  fallback. Sensei always shows *your* keys — even if you rebound everything.
+  your real Hyprland config: `bin/sensei-binds` runs your config entry point
+  with a stubbed Hyprland API to record every binding, then resolves keycodes
+  through your compiled keymap, with `hyprctl binds -j` as fallback. Sensei
+  always shows *your* keys — even if you rebound everything.
 - **It verifies by results, not keypresses.** Steps complete when the real
   compositor event fires (workspace changed, window moved, terminal opened).
   Use a key, a menu, or the mouse — if you did the thing, you advance.
@@ -33,7 +34,12 @@ Open Sensei:
 omarchy-shell shell toggle io.github.yehudagurovich.sensei '{}'
 ```
 
-Bind it to a key for quick access.
+Bind it to a key for quick access. A payload can launch a specific lesson
+directly — handy for binding the welcome tour itself:
+
+```sh
+omarchy-shell shell toggle io.github.yehudagurovich.sensei '{"lesson":"welcome-tour"}'
+```
 
 ## Requirements
 
@@ -92,4 +98,5 @@ step verified against real compositor events. See `PLAN.md`.
 
 ## License
 
-MIT
+MIT. The keybinding scan in `bin/sensei-binds` is derived from Omarchy's own
+`omarchy-menu-keybindings` (MIT); see the notices at the end of `LICENSE`.

@@ -19,3 +19,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+Third-party notices and dependencies:
+
+- The keybinding scan in bin/sensei-binds (config-execution recording and
+  keycode-to-symbol resolution) is derived from omarchy-menu-keybindings,
+  part of Omarchy (https://github.com/basecamp/omarchy), MIT License,
+  Copyright Omarchy contributors.
+- Runtime dependencies, all shipped with Omarchy Quattro: hyprctl
+  (Hyprland), bash, gawk, lua, xkbcli (libxkbcommon), and the Quickshell
+  runtime hosting the plugin. No dependencies are bundled.

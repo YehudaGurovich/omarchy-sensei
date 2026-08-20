@@ -34,8 +34,18 @@ Item {
     return names
   }
 
+  // The hyprctl fallback can surface raw XKB keycodes; map the common ones
+  // so keycaps read "2", not "code:11" (same table as bin/sensei-binds).
+  readonly property var keycodeSymbols: ({
+    "code:10": "1", "code:11": "2", "code:12": "3", "code:13": "4",
+    "code:14": "5", "code:15": "6", "code:16": "7", "code:17": "8",
+    "code:18": "9", "code:19": "0", "code:20": "MINUS", "code:21": "EQUAL",
+    "code:59": "COMMA", "code:60": "PERIOD", "code:61": "SLASH"
+  })
+
   function displayKey(key) {
     var k = String(key || "")
+    if (root.keycodeSymbols[k]) return root.keycodeSymbols[k]
     if (k.length === 1) return k.toUpperCase()
     return k
   }

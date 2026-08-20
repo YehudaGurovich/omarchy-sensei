@@ -24,14 +24,18 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
 
 - **Day 1 — DONE (Aug 20):** walkthrough engine — bind resolver, Hyprland
   event listener, step state machine, coach card UI, dojo theming (penguin
-  mascot, belts, praise lines), IPC routes (`sensei start/status/end`).
+  mascot, belts, praise lines), IPC routes (`sensei start/status/skip/end` —
+  skip mirrors the coach card button and drives scripted testing).
   Verified end to end against the live compositor.
   Findings that changed the design:
   - Hyprland's Lua config provider hides keys for `code:` binds in
     `hyprctl binds -j` (59 binds affected). Fix: `bin/sensei-binds` executes
-    the user's real config entry point in a sandboxed Lua and resolves
-    keycodes through the compiled keymap (approach mirrors Omarchy's own
-    omarchy-menu-keybindings). hyprctl stays as fallback.
+    the user's real config entry point with a stubbed `hl` API (not a
+    sandbox — the config runs its full stdlib, as it already does inside
+    Hyprland) and resolves keycodes through the compiled keymap (approach
+    mirrors Omarchy's own omarchy-menu-keybindings). hyprctl stays as
+    fallback. Known upstream-shared limitation: keycode symbols come from
+    the environment's default layout, not Hyprland's kb_layout.
   - Multi-monitor: focusing a workspace already visible on another monitor
     emits `focusedmon`, not `workspace`. Steps now await alternative events.
   - Untested so far: the move-window lesson (same await mechanism, but not

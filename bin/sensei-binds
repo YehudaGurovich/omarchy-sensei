@@ -3,9 +3,13 @@
 #
 # Hyprland's Lua config provider reports Lua binds as dispatcher __lua and
 # loses the key for code: bindings in `hyprctl binds`. This scan executes the
-# user's real config entry point in a sandboxed Lua and records hl.bind calls,
-# then resolves keycodes to symbols via the compiled keymap. The approach
-# mirrors Omarchy's own omarchy-menu-keybindings (MIT).
+# user's real config entry point with a stubbed `hl` API and records hl.bind
+# calls, then resolves keycodes to symbols via the compiled keymap. Note this
+# is NOT a sandbox: the config runs with the full Lua stdlib, exactly as it
+# already does inside Hyprland. The approach mirrors Omarchy's own
+# omarchy-menu-keybindings (MIT). Known limitation (shared with upstream):
+# `xkbcli compile-keymap` uses the environment's default layout, so code:
+# symbols can mislabel on non-default layouts.
 set -euo pipefail
 
 command -v lua >/dev/null 2>&1 || exit 0

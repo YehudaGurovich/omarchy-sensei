@@ -32,6 +32,7 @@ Item {
   // Window-local {x,y,w,h} of the region the current step highlights, or null.
   property var spotlightRect: null
   property string spotlightNs: ""
+  property bool spotlightRequery: false
 
   // Shares the [menu] surface tokens so every Omarchy theme styles Sensei.
   property color background: Color.menu.background
@@ -51,13 +52,16 @@ Item {
   property int coachWidth: Style.space(330)
   property int smallFont: Math.max(10, Math.round(Style.font.body * 0.85))
 
+  function findLesson(id) {
+    var match = Lessons.all().filter(function(l) { return l.id === id })
+    return match.length ? match[0] : null
+  }
+
   function open(payloadJson) {
     var payload = {}
     try { payload = JSON.parse(payloadJson || "{}") } catch (e) {}
-    if (payload && payload.lesson) {
-      var match = Lessons.all().filter(function(l) { return l.id === payload.lesson })
-      if (match.length) { root.startLesson(match[0]); return }
-    }
+    var lessonData = payload && payload.lesson ? root.findLesson(payload.lesson) : null
+    if (lessonData) { root.startLesson(lessonData); return }
     root.openBrowser()
   }
 
@@ -70,6 +74,8 @@ Item {
     Qt.callLater(function() { keyCatcher.forceActiveFocus() })
   }
 
+  // Shell overlay contract: the shell calls close() when it hides the
+  // plugin, mirroring the built-in overlays.
   function close() {
     root.endLesson()
     root.opened = false
@@ -126,6 +132,8 @@ Item {
     root.stepBindFound = true
     root.skipUsed = false
     root.praiseText = ""
+    root.spotlightRect = null
+    root.spotlightNs = ""
     praiseTimer.stop()
     binds.refresh()
     console.log("sensei: lesson start " + lessonData.id)
@@ -156,13 +164,16 @@ Item {
   // a missing anchor (replaced bar, other monitor) degrades to no spotlight.
   function querySpotlight(step) {
     root.spotlightRect = null
-    var ns = ({ bar: "omarchy-bar" })[step && step.spotlight]
-    if (!ns) return
-    root.spotlightNs = ns
-    if (!spotlightProcess.running) spotlightProcess.running = true
+    root.spotlightNs = ({ bar: "omarchy-bar" })[step && step.spotlight] || ""
+    if (!root.spotlightNs) return
+    if (spotlightProcess.running) root.spotlightRequery = true
+    else spotlightProcess.running = true
   }
 
   function applySpotlight(output) {
+    // A step change may have cleared the namespace while the query was in
+    // flight; a late result must not ring a step that asked for nothing.
+    if (!root.spotlightNs) return
     var parts = String(output || "").split("\n---\n")
     if (parts.length < 2) return
     var layers, monitors
@@ -196,6 +207,12 @@ Item {
     id: spotlightProcess
     running: false
     command: ["bash", "-c", 'printf "%s\\n---\\n%s\\n" "$(hyprctl -j layers)" "$(hyprctl -j monitors)"']
+    onExited: {
+      if (root.spotlightRequery) {
+        root.spotlightRequery = false
+        spotlightProcess.running = true
+      }
+    }
 
     stdout: StdioCollector {
       waitForEnd: true
@@ -280,10 +297,10 @@ Item {
     target: "sensei"
 
     function start(lessonId: string): string {
-      var match = Lessons.all().filter(function(l) { return l.id === lessonId })
-      if (!match.length) return "unknown lesson: " + lessonId
+      var lessonData = root.findLesson(lessonId)
+      if (!lessonData) return "unknown lesson: " + lessonId
       root.opened = false
-      root.startLesson(match[0])
+      root.startLesson(lessonData)
       return "started " + lessonId
     }
 
@@ -302,6 +319,7 @@ Item {
     }
 
     function skip(): string {
+      if (!root.lesson || root.phase !== "await") return "nothing to skip"
       root.stepComplete(true)
       return "skipped"
     }

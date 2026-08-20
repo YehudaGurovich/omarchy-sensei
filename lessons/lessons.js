@@ -4,23 +4,41 @@
 //   id        unique slug
 //   title     shown in the browser list
 //   keywords  extra search terms
-//   intro     one-line summary (reserved for the lesson intro card)
+//   intro     one-line summary shown on a lesson's first step
 //   steps     ordered list of Step
 //
 // Step:
-//   say        plain instruction text; the resolved keycaps render below it
+//   say        plain instruction text; the resolved keycaps render below it.
+//              When bind is null the key belongs in the instruction (e.g.
+//              "close with Esc") and the step still verifies by event.
 //   bind       keybinding description resolved from the user's live config
 //              (bin/sensei-binds + hyprctl) — never a hardcoded key
 //   await      completion signal from the Hyprland event socket. One object
-//              or an array of alternatives (any match completes the step):
-//                { event: "workspace", data: "^2$" }
-//              On multi-monitor setups, focusing a workspace that is already
-//              visible on another monitor emits focusedmon ("MONITOR,WS")
-//              instead of workspace, so workspace steps await both.
+//              or an array of alternatives (any match completes the step).
 //              Keep patterns as tight as the event data allows — a loose
 //              pattern lets unrelated activity complete the step.
 //              null means the step advances only with the manual Next button.
-//   spotlight  "bar" | null — layer surface to highlight (Day 2)
+//   spotlight  "bar" | null — layer surface to highlight while waiting
+
+// openwindow data is "ADDRESS,WS,CLASS,TITLE"; match the class of common
+// terminals so an unrelated window cannot complete a terminal step.
+var TERMINAL_OPENWINDOW = {
+  event: "openwindow",
+  data: "^[^,]*,[^,]*,([Aa]lacritty|foot|footclient|kitty|com\\.mitchellh\\.ghostty|ghostty|org\\.wezfurlong\\.wezterm|wezterm|[Kk]onsole|[Ss]t|[Xx]term),"
+}
+
+// Reaching workspace N is verified by result, not by keypress. Two events
+// can prove it: `workspace` (a monitor switched to N) and `focusedmon`
+// ("MONITOR,N" — focus moved to a monitor already showing N). The second is
+// deliberate: on multi-monitor setups, focusing the other monitor IS a valid
+// way to arrive at its workspace, and pressing the taught key emits only
+// focusedmon when N is already visible there.
+function workspaceAwait(n) {
+  return [
+    { event: "workspace", data: "^" + n + "$" },
+    { event: "focusedmon", data: "," + n + "$" }
+  ]
+}
 
 var LESSONS = [
   {
@@ -32,19 +50,13 @@ var LESSONS = [
       {
         say: "Jump to workspace 2.",
         bind: "Switch to workspace 2",
-        await: [
-          { event: "workspace", data: "^2$" },
-          { event: "focusedmon", data: ",2$" }
-        ],
+        await: workspaceAwait(2),
         spotlight: "bar"
       },
       {
         say: "Open a terminal.",
         bind: "Terminal",
-        await: {
-          event: "openwindow",
-          data: "^[^,]*,[^,]*,([Aa]lacritty|foot|footclient|kitty|com\\.mitchellh\\.ghostty|ghostty|org\\.wezfurlong\\.wezterm|wezterm|[Kk]onsole|[Ss]t|[Xx]term),"
-        },
+        await: TERMINAL_OPENWINDOW,
         spotlight: null
       },
       {
@@ -54,13 +66,12 @@ var LESSONS = [
         spotlight: null
       },
       {
-        // The tour flow guarantees the former workspace here is 2.
+        // The tour's expected return target is 2 (the flow passes through
+        // it); a user who wanders to 2 mid-step completes it early, which
+        // is acceptable — they are where the step wanted them.
         say: "Bounce back to the workspace you came from.",
         bind: "Former workspace",
-        await: [
-          { event: "workspace", data: "^2$" },
-          { event: "focusedmon", data: ",2$" }
-        ],
+        await: workspaceAwait(2),
         spotlight: "bar"
       }
     ]
@@ -74,29 +85,20 @@ var LESSONS = [
       {
         say: "Jump to workspace 2.",
         bind: "Switch to workspace 2",
-        await: [
-          { event: "workspace", data: "^2$" },
-          { event: "focusedmon", data: ",2$" }
-        ],
+        await: workspaceAwait(2),
         spotlight: "bar"
       },
       {
         say: "Now come back to workspace 1.",
         bind: "Switch to workspace 1",
-        await: [
-          { event: "workspace", data: "^1$" },
-          { event: "focusedmon", data: ",1$" }
-        ],
+        await: workspaceAwait(1),
         spotlight: "bar"
       },
       {
-        // The lesson flow guarantees the former workspace here is 2.
+        // The lesson flow makes 2 the expected return target.
         say: "Bounce back to the workspace you came from.",
         bind: "Former workspace",
-        await: [
-          { event: "workspace", data: "^2$" },
-          { event: "focusedmon", data: ",2$" }
-        ],
+        await: workspaceAwait(2),
         spotlight: null
       }
     ]
@@ -130,14 +132,9 @@ var LESSONS = [
     intro: "Omarchy launches your default terminal with one keybinding.",
     steps: [
       {
-        // openwindow data is "ADDRESS,WS,CLASS,TITLE"; match the class of
-        // common terminals so an unrelated window cannot complete the step.
         say: "Open a new terminal window.",
         bind: "Terminal",
-        await: {
-          event: "openwindow",
-          data: "^[^,]*,[^,]*,([Aa]lacritty|foot|footclient|kitty|com\\.mitchellh\\.ghostty|ghostty|org\\.wezfurlong\\.wezterm|wezterm|[Kk]onsole|[Ss]t|[Xx]term),"
-        },
+        await: TERMINAL_OPENWINDOW,
         spotlight: null
       }
     ]
