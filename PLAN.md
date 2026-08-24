@@ -72,10 +72,12 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
 ## Dev loop
 
 ```sh
-./dev.sh          # sync repo -> ~/.config/omarchy/plugins/<id> and rescan
-omarchy restart shell   # when hot reload does not pick up changes
+./dev.sh          # sync repo -> ~/.config/omarchy/plugins/<id> and restart the shell
 omarchy-shell shell toggle io.github.yehudagurovich.sensei '{}'
 ```
+
+The sync refuses to run while the session is locked. Writing plugin files
+during a lock can reload the shell into an invalid session-lock state.
 
 Logs: `qs log` workflow.
 
