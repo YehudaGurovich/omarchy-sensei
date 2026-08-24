@@ -29,6 +29,9 @@ TestCase {
   }
 
   function init() {
+    fastScroll.scrollMotion.stop()
+    fastScroll.inputIdle.stop()
+    fastScroll.scrollDestination = 0
     list.positionViewAtBeginning()
     wait(0)
     compare(list.contentY, 0)
@@ -55,6 +58,16 @@ TestCase {
   function test_top_clamp() {
     fastScroll.applyInput(0, 120)
     compare(list.contentY, 0)
+  }
+
+  function test_continuous_touchpad_reaches_expected_position() {
+    for (var index = 0; index < 12; index++) {
+      fastScroll.applyInput(-8, 0)
+      wait(10)
+    }
+
+    verify(list.contentY >= 182)
+    tryCompare(list, "contentY", 192, 80)
   }
 
   function test_touchpad_pixels_use_short_motion() {

@@ -218,7 +218,8 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
   - Version 1.6.0 added explicit fast scrolling for both touchpads and mouse
     wheels, with a repeatable scroll-speed test. Hover effects pause during
     scroll input. Mouse-wheel steps now use a short, smooth motion. Touchpad
-    scrolling uses a shorter motion to stay responsive.
+    scrolling uses a 16 ms motion so a continuous gesture stays close to the
+    finger.
   - Version 1.6.0 kept the flat mascot style and added clear Linux penguin
     traits: broad orange feet, a pear-shaped belly, tall face patches, and a
     broad two-part beak. The header uses the official Omarchy logo, and the
