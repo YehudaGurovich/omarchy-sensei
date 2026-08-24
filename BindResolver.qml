@@ -1,5 +1,6 @@
 import Quickshell.Io
 import QtQuick
+import "BindSelection.js" as BindSelection
 
 // Resolves lesson bind descriptions against the user's live Hyprland
 // keybindings, so instructions always show the keys this machine uses.
@@ -67,13 +68,18 @@ Item {
       waitForEnd: true
       onStreamFinished: {
         // The config executes defaults first and user files after, so later
-        // lines overwrite earlier ones and a user override wins.
+        // readable lines overwrite earlier ones and a user override wins.
+        // An unresolved alternate keycode cannot replace a readable binding.
         var map = {}
         var lines = String(text || "").split("\n")
         for (var i = 0; i < lines.length; i++) {
           var parts = lines[i].split("\t")
           if (parts.length < 3 || !parts[2]) continue
-          map[parts[1].trim().toLowerCase()] = { modmask: parseInt(parts[0], 10) || 0, key: parts[2] }
+          var description = parts[1].trim().toLowerCase()
+          var current = map[description]
+          if (current && !BindSelection.shouldReplaceBinding(current.key, parts[2]))
+            continue
+          map[description] = { modmask: parseInt(parts[0], 10) || 0, key: parts[2] }
         }
         root.luaMap = map
         root.ready = true
@@ -100,10 +106,13 @@ Item {
         for (var i = 0; i < binds.length; i++) {
           var b = binds[i]
           var desc = String(b.description || "").trim().toLowerCase()
-          if (!desc || map[desc]) continue
+          if (!desc) continue
           var key = String(b.key || "")
           if (!key && b.keycode) key = "code:" + b.keycode
           if (!key) continue
+          var current = map[desc]
+          if (current && !BindSelection.shouldReplaceBinding(current.key, key))
+            continue
           map[desc] = { modmask: b.modmask, key: key }
         }
         root.hyprctlMap = map

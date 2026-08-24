@@ -2,11 +2,16 @@
 
 const fs = require("fs")
 const path = require("path")
+const childProcess = require("child_process")
+const vm = require("vm")
 
 const source = fs.readFileSync(path.resolve(__dirname, "..", "Sensei.qml"), "utf8")
 const barSource = fs.readFileSync(path.resolve(__dirname, "..", "BarWidget.qml"), "utf8")
+const bindResolverSource = fs.readFileSync(
+  path.resolve(__dirname, "..", "BindResolver.qml"), "utf8")
 const fastScrollSource = fs.readFileSync(
   path.resolve(__dirname, "..", "FastScrollHandler.qml"), "utf8")
+const bindSelectionPath = path.resolve(__dirname, "..", "BindSelection.js")
 const errors = []
 
 function requirePattern(pattern, message) {
@@ -50,9 +55,44 @@ if (!source.includes('text: "\\ue900"') || !/font\.family:\s*"omarchy"/.test(sou
 if (!/tooltipText:\s*"Omarchy Dojo · "\s*\+\s*root\.earnedXp\s*\+\s*" \/ "\s*\+\s*root\.courseXp\s*\+\s*" XP"/.test(barSource))
   errors.push("BarWidget.qml: keep the bar hover text to the dojo name and total XP")
 
+if (!fs.existsSync(bindSelectionPath)) {
+  errors.push("BindSelection.js: keep tutorial shortcuts readable when descriptions have aliases")
+} else {
+  const bindSelection = vm.createContext({})
+  vm.runInContext(fs.readFileSync(bindSelectionPath, "utf8"), bindSelection, {
+    filename: bindSelectionPath
+  })
+  if (!bindSelection.shouldReplaceBinding("code:201", "SPACE"))
+    errors.push("BindSelection.js: replace an unresolved keycode with a readable shortcut")
+  if (bindSelection.shouldReplaceBinding("SPACE", "code:201"))
+    errors.push("BindSelection.js: keep a readable shortcut instead of an unresolved alias")
+  if (!bindSelection.shouldReplaceBinding("SPACE", "K"))
+    errors.push("BindSelection.js: let a later readable user override win")
+
+  const scan = childProcess.spawnSync(
+    path.resolve(__dirname, "sensei-binds"), [], { encoding: "utf8" })
+  if (scan.status === 0) {
+    const activeBindings = {}
+    String(scan.stdout || "").split("\n").forEach(line => {
+      const parts = line.split("\t")
+      if (parts.length < 3 || !parts[2]) return
+      const description = parts[1].trim().toLowerCase()
+      const current = activeBindings[description]
+      if (!current || bindSelection.shouldReplaceBinding(current.key, parts[2]))
+        activeBindings[description] = { modmask: Number(parts[0]) || 0, key: parts[2] }
+    })
+    const menuBinding = activeBindings["omarchy menu"]
+    if (menuBinding && bindSelection.unresolvedKeycode(menuBinding.key))
+      errors.push("BindResolver.qml: Omarchy menu resolved to an unreadable keycode")
+  }
+}
+if (!/^import "BindSelection\.js" as BindSelection$/m.test(bindResolverSource)
+    || !/BindSelection\.shouldReplaceBinding\(/.test(bindResolverSource))
+  errors.push("BindResolver.qml: use the tested shortcut-selection policy")
+
 if (errors.length) {
   errors.forEach(error => console.error(`Sensei.qml: ${error}`))
   process.exit(1)
 }
 
-console.log("Validated native lesson-list scrolling")
+console.log("Validated native lesson-list scrolling and readable shortcuts")

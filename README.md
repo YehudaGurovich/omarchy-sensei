@@ -191,6 +191,9 @@ Recent additions:
   screen-space controls, layouts, themes, Stay Awake, suspend/resume, plugins,
   Pacman, web apps, dictation, OCR, screen recording and sharing, focus modes,
   hardware panels, reminders, and visual window toggles.
+- **Readable live shortcuts.** Tutorial keycaps use the latest readable active
+  binding. An unresolved alternate hardware key cannot replace a clear primary
+  shortcut such as Super + Space for the Omarchy menu.
 - **Reliable centering.** The dojo recenters each time it opens and when its
   monitor size changes. It remains draggable during the current visit.
 - **A course browser that shows its controls.** The larger dojo has explicit
