@@ -1,0 +1,119 @@
+#!/usr/bin/env node
+
+const fs = require("fs")
+const path = require("path")
+const vm = require("vm")
+
+const root = path.resolve(__dirname, "..")
+const sourcePath = path.join(root, "lessons", "lessons.js")
+const context = vm.createContext({})
+const expectedLessonCount = 33
+const expectedStepCount = 136
+
+vm.runInContext(fs.readFileSync(sourcePath, "utf8"), context, {
+  filename: sourcePath
+})
+
+const lessons = context.LESSONS
+const errors = []
+const ids = new Set()
+const requiredLessonFields = [
+  "id", "title", "keywords", "category", "duration", "difficulty",
+  "intro", "outro", "steps"
+]
+const lessonStringFields = ["title", "category", "intro", "outro"]
+const requiredStepFields = ["say", "bind", "await", "spotlight", "why"]
+const spotlights = new Set([null, "bar", "menu", "emojis", "clipboard", "window"])
+
+function fail(location, message) {
+  errors.push(`${location}: ${message}`)
+}
+
+function validateAwait(value, location) {
+  if (value === null) return
+  const alternatives = Array.isArray(value) ? value : [value]
+  if (alternatives.length === 0) fail(location, "await alternatives cannot be empty")
+  alternatives.forEach((item, index) => {
+    const itemLocation = `${location}${alternatives.length > 1 ? `[${index}]` : ""}`
+    if (!item || typeof item !== "object" || Array.isArray(item)) {
+      fail(itemLocation, "await must be null, an event object, or an event-object array")
+      return
+    }
+    if (typeof item.event !== "string" || !item.event)
+      fail(itemLocation, "event must be a non-empty string")
+    if (typeof item.data !== "string" || !item.data)
+      fail(itemLocation, "data must be a non-empty string")
+    else {
+      try { new RegExp(item.data) }
+      catch (error) { fail(itemLocation, `data is not a valid regular expression: ${error.message}`) }
+    }
+  })
+}
+
+if (!Array.isArray(lessons)) {
+  fail("LESSONS", "must be an array")
+} else {
+  lessons.forEach((lesson, lessonIndex) => {
+    const lessonLocation = `lesson[${lessonIndex}]`
+    requiredLessonFields.forEach(field => {
+      if (!Object.prototype.hasOwnProperty.call(lesson, field))
+        fail(lessonLocation, `missing ${field}`)
+    })
+
+    if (typeof lesson.id !== "string" || !lesson.id) fail(lessonLocation, "id must be a non-empty string")
+    else if (ids.has(lesson.id)) fail(lessonLocation, `duplicate id ${lesson.id}`)
+    else ids.add(lesson.id)
+    if (!Array.isArray(lesson.keywords)) fail(lessonLocation, "keywords must be an array")
+    else if (lesson.keywords.some(keyword => typeof keyword !== "string" || !keyword))
+      fail(lessonLocation, "keywords must contain only non-empty strings")
+    lessonStringFields.forEach(field => {
+      if (typeof lesson[field] !== "string" || !lesson[field])
+        fail(lessonLocation, `${field} must be a non-empty string`)
+    })
+    if (!Number.isInteger(lesson.duration) || lesson.duration < 1)
+      fail(lessonLocation, "duration must be a positive integer")
+    if (![1, 2, 3].includes(lesson.difficulty))
+      fail(lessonLocation, "difficulty must be 1, 2, or 3")
+    if (!Array.isArray(lesson.steps) || lesson.steps.length === 0) {
+      fail(lessonLocation, "steps must be a non-empty array")
+      return
+    }
+
+    lesson.steps.forEach((step, stepIndex) => {
+      const stepLocation = `${lesson.id || lessonLocation}.step[${stepIndex}]`
+      requiredStepFields.forEach(field => {
+        if (!Object.prototype.hasOwnProperty.call(step, field))
+          fail(stepLocation, `missing ${field}`)
+      })
+      if (typeof step.say !== "string" || !step.say) fail(stepLocation, "say must be a non-empty string")
+      if (step.bind !== null && (typeof step.bind !== "string" || !step.bind))
+        fail(stepLocation, "bind must be null or a non-empty string")
+      if (!spotlights.has(step.spotlight)) fail(stepLocation, `unknown spotlight ${step.spotlight}`)
+      if (typeof step.why !== "string" || !step.why) fail(stepLocation, "why must be a non-empty string")
+      if (step.hint !== undefined && (typeof step.hint !== "string" || !step.hint))
+        fail(stepLocation, "hint must be a non-empty string")
+      if (step.nextLabel !== undefined && (typeof step.nextLabel !== "string" || !step.nextLabel))
+        fail(stepLocation, "nextLabel must be a non-empty string")
+      if (step.nextLabel !== undefined && step.await !== null)
+        fail(stepLocation, "nextLabel is only valid on a manual step")
+      if (step.notOnWorkspace !== undefined && !Number.isInteger(step.notOnWorkspace))
+        fail(stepLocation, "notOnWorkspace must be an integer")
+      validateAwait(step.await, `${stepLocation}.await`)
+    })
+  })
+}
+
+const stepCount = Array.isArray(lessons)
+  ? lessons.reduce((total, lesson) => total + (Array.isArray(lesson.steps) ? lesson.steps.length : 0), 0)
+  : 0
+if (Array.isArray(lessons) && lessons.length !== expectedLessonCount)
+  fail("LESSONS", `expected ${expectedLessonCount} lessons, found ${lessons.length}`)
+if (stepCount !== expectedStepCount)
+  fail("LESSONS", `expected ${expectedStepCount} steps, found ${stepCount}`)
+
+if (errors.length) {
+  errors.forEach(error => console.error(error))
+  process.exit(1)
+}
+
+console.log(`Validated ${lessons.length} lessons and ${stepCount} steps`)

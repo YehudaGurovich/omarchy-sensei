@@ -396,7 +396,7 @@ var LESSONS = [
   },
   {
     id: "keybinding-finder",
-    title: "Find shortcuts with Super K and Ctrl K",
+    title: "Find shortcuts with Super K and Super Ctrl K",
     keywords: ["keybindings", "shortcut", "super k", "ctrl k", "herdr", "search"],
     category: "Essentials",
     duration: 6,
@@ -815,14 +815,14 @@ var LESSONS = [
     ]
   },
   {
-    id: "manage-plugins",
-    title: "Enable and disable an Omarchy plugin",
-    keywords: ["plugin", "plugins", "enable", "disable", "toggle", "shell", "bar"],
+    id: "enable-microphone-plugin",
+    title: "Enable the Microphone plugin",
+    keywords: ["plugin", "plugins", "enable", "microphone", "shell", "bar"],
     category: "System",
-    duration: 8,
+    duration: 4,
     difficulty: 3,
-    intro: "Turn on one installed shell plugin, inspect the result, then turn the same plugin off again.",
-    outro: "You can now experiment with installed plugins and return the shell to its previous state.",
+    intro: "Add Omarchy’s Microphone control to the bar. The shell reload happens only after the final step.",
+    outro: "The Microphone plugin is active. Reopen Sensei to use it and remove it in the next lesson.",
     steps: [
       {
         say: "Open the Omarchy menu.",
@@ -832,20 +832,42 @@ var LESSONS = [
         why: "Plugin management lives under Setup because it changes which shell modules are active."
       },
       {
-        say: "Open Setup → Plugins → Enable Plugin, choose one disabled plugin, and press Enter.",
+        say: "Open Setup → Plugins → Enable Plugin, choose Microphone, and press Enter. Sensei will close while the shell reloads; reopen it for the next lesson.",
         bind: null,
         await: { event: "closelayer", data: "^omarchy-menu$" },
         spotlight: "menu",
-        hint: "If the list is empty, every available plugin is already enabled; close the menu and finish the lesson manually.",
-        why: "Enabling adds the plugin to the shell configuration and loads its panel, widget, or service."
-      },
+        hint: "If Microphone is not listed, it is already enabled. Close the menu, skip this step, and continue with the next lesson.",
+        why: "A plugin toggle changes shell configuration. Making it the last step lets Sensei save completion before the panels reload."
+      }
+    ]
+  },
+  {
+    id: "use-disable-microphone-plugin",
+    title: "Use and disable the Microphone plugin",
+    keywords: ["plugin", "plugins", "use", "disable", "toggle", "microphone", "mute", "bar"],
+    category: "System",
+    duration: 5,
+    difficulty: 3,
+    intro: "Try the Microphone bar control, restore its starting state, then remove the control from the bar.",
+    outro: "You used a bar plugin and removed it without deleting its files.",
+    steps: [
       {
-        say: "Note the plugin name and inspect any new bar item or panel it added.",
+        say: "Find the Microphone icon in the bar. Click it once and note whether the microphone becomes muted or live.",
         bind: null,
         await: null,
         spotlight: "bar",
-        nextLabel: "Plugin inspected",
-        why: "Remembering the name lets you reverse the exact change instead of disabling something unrelated."
+        nextLabel: "Microphone toggled",
+        hint: "If this computer has no microphone source, the icon can be hidden. Continue to the disable step.",
+        why: "The plugin gives direct feedback and control without opening the full audio panel."
+      },
+      {
+        say: "Click the Microphone icon again to restore its starting mute state.",
+        bind: null,
+        await: null,
+        spotlight: "bar",
+        nextLabel: "State restored",
+        hint: "If the icon is hidden, continue without changing audio state.",
+        why: "Restoring the state keeps this practice task from changing your recording setup."
       },
       {
         say: "Open the Omarchy menu again.",
@@ -855,12 +877,12 @@ var LESSONS = [
         why: "The disable flow uses the same Setup → Plugins route as enable."
       },
       {
-        say: "Open Setup → Plugins → Disable Plugin and choose the same plugin. Do not disable Sensei.",
+        say: "Open Setup → Plugins → Disable Plugin and choose Microphone. Sensei will close while the shell reloads.",
         bind: null,
         await: { event: "closelayer", data: "^omarchy-menu$" },
         spotlight: "menu",
-        hint: "Sensei is the tutorial that is guiding you. Disabling it would end this lesson immediately.",
-        why: "Disabling the same plugin restores the starting shell layout without deleting its files."
+        hint: "Choose Microphone, not Sensei. Disabling Sensei would remove the tutorial from the bar.",
+        why: "Disabling a bar plugin removes its layout entry but keeps the plugin installed."
       }
     ]
   },

@@ -115,7 +115,7 @@ Lessons are plain data in `lessons/lessons.js`. Each step declares:
 - lessons also carry `category`, `duration`, `outro`, and `difficulty`
   (1–3); first mastery awards 10 × difficulty points toward the rank ladder
 
-The pack has 32 lessons and 135 steps, from short verified actions to
+The pack has 33 lessons and 136 steps, from short verified actions to
 multi-step system workflows and two guided circuits.
 Contributions of new lessons are welcome.
 
@@ -161,7 +161,7 @@ waits too long offers a hint instead of leaving you stuck.
 Version 1.4.0 — the walkthrough engine works end to end: live key
 resolution (including Lua `code:` binds via the compiled keymap),
 event-driven step completion (multi-monitor aware), spotlight highlighting,
-persistent progress and belts, and the coach card. Thirty-two lessons and 135
+persistent progress and belts, and the coach card. Thirty-three lessons and 136
 steps cover desktop navigation, power, appearance, software, plugins, input,
 capture, sharing, hardware panels, and longer guided circuits. Detectable
 actions use real compositor events; safe manual checkpoints cover workflows
@@ -169,7 +169,7 @@ such as Pacman installation and suspend. See `PLAN.md`.
 
 Recent additions:
 
-- **Twenty advanced workflows.** The course now teaches Super + Space menu
+- **Twenty-one advanced workflows.** The course now teaches Super + Space menu
   navigation, Super + Ctrl + K, silent window moves, focus and swap, resizing,
   screen-space controls, layouts, themes, Stay Awake, suspend/resume, plugins,
   Pacman, web apps, dictation, OCR, screen recording and sharing, focus modes,
@@ -205,6 +205,14 @@ Recent additions:
   step's own hint if it has one, otherwise an honest way out.
 - **A penguin in your bar.** Sensei ships a bar widget: one click opens the
   dojo, and a first-time button starts the welcome tour.
+
+## Development
+
+Validate the lesson schema and its counts with:
+
+```sh
+./bin/sensei-validate-lessons
+```
 
 ## License
 

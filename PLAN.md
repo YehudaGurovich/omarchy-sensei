@@ -170,11 +170,12 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
     bar, browser, and coach. The bar watches progress.json and updates after
     mastery without a shell restart.
   - Verification: `qmllint -I /usr/share/omarchy/shell` passes for all QML
-    files; `omarchy plugin validate .`, `node --check`, the lesson-data
-    invariant check, and `git diff --check` pass. The live shell showed the
-    centered 12-lesson browser and coach with no Sensei runtime warnings.
+    files; `omarchy plugin validate .`, `node --check`,
+    `bin/sensei-validate-lessons`, and `git diff --check` pass. The live shell
+    showed the centered 12-lesson browser and coach with no Sensei runtime
+    warnings.
 - **Day 4 round 6 — DONE (Aug 23): advanced operating-system course (1.4.0).**
-  - Added 20 multi-step lessons. The 32-lesson, 135-step pack now covers
+  - Added 21 multi-step lessons. The 33-lesson, 136-step pack now covers
     menu and app search, keybinding references, advanced window control,
     screen-space toggles, appearance, power, plugins, Pacman packages, web
     apps, dictation, capture, OCR, recording, sharing, hardware panels, and
@@ -184,8 +185,10 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
     suspend/resume — use explicit manual checkpoints with action-specific
     button labels.
   - Reversible lessons restore the starting state for layout, shell space,
-    Stay Awake, plugins, focus modes, and window visuals. Destructive targets
-    such as a package or web app remain the learner’s choice.
+    Stay Awake, focus modes, and window visuals. The plugin lessons enable,
+    use, and disable the Microphone bar control across safe shell reloads.
+    Destructive targets such as a package or web app remain the learner’s
+    choice.
   - The dojo now recenters on every open and monitor-size change, while its
     header remains draggable for the current visit.
   - Added a `sensei dismiss` IPC action. A normal Super+W close helper can now
