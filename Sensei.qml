@@ -1035,9 +1035,10 @@ Item {
         Item {
           id: listFrame
           width: parent.width
-          height: parent.height - dojoHeader.height - searchField.height - filterPanel.height
-            - resultsHeader.height - beltRow.height - root.contentSpacing * 5
-            - (firstTimeHint.visible ? firstTimeHint.height + root.contentSpacing : 0)
+          height: Math.max(0,
+            parent.height - dojoHeader.height - searchField.height - filterPanel.height
+              - resultsHeader.height - beltRow.height - root.contentSpacing * 5
+              - (firstTimeHint.visible ? firstTimeHint.height + root.contentSpacing : 0))
 
           ListView {
             id: lessonList
@@ -1048,6 +1049,8 @@ Item {
             boundsBehavior: Flickable.StopAtBounds
             flickableDirection: Flickable.VerticalFlick
             interactive: contentHeight > height
+            reuseItems: true
+            cacheBuffer: Math.max(0, height * 2)
             ScrollBar.vertical: ScrollBar {
               policy: ScrollBar.AsNeeded
               interactive: true
@@ -1084,9 +1087,10 @@ Item {
               radius: root.cornerRadius
               readonly property int accentGutter: Style.space(18)
               readonly property bool selected: model.index === root.selectedIndex
+              readonly property bool hovered: lessonHover.hovered && !lessonList.moving
               readonly property color rowText: selected ? root.selectedText : root.foreground
               color: selected ? root.selectedBackground
-                : lessonArea.containsMouse ? Qt.alpha(root.selectedBackground, 0.14) : Qt.alpha(root.border, 0.08)
+                : hovered ? Qt.alpha(root.selectedBackground, 0.14) : Qt.alpha(root.border, 0.08)
               border.color: selected ? root.selectedBackground : Qt.alpha(root.border, 0.45)
               border.width: 1
 
@@ -1179,15 +1183,16 @@ Item {
                 }
               }
 
-              MouseArea {
-                id: lessonArea
-                anchors.fill: parent
-                hoverEnabled: true
+              HoverHandler {
+                id: lessonHover
                 cursorShape: Qt.PointingHandCursor
-                onEntered: {
-                  if (!lessonList.moving) root.selectedIndex = model.index
+                onHoveredChanged: {
+                  if (hovered && !lessonList.moving) root.selectedIndex = model.index
                 }
-                onClicked: root.activateIndex(model.index)
+              }
+
+              TapHandler {
+                onTapped: root.activateIndex(model.index)
               }
 
               Behavior on color { ColorAnimation { duration: 140 } }

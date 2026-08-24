@@ -208,9 +208,10 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
     all 33 lessons. The old points field remains for schema compatibility but
     is no longer a second visible rank ladder.
   - Replaced the custom non-interactive scroll track with the native Omarchy
-    Qt Quick scrollbar and stock flick behavior. Removed delegate entrance
-    animations that replayed as rows were created during scrolling. Fresh
-    opens and filter changes now reset the list to the first result.
+    Qt Quick scrollbar and stock flick behavior. Replaced each row's
+    MouseArea with pointer handlers, and prepared reusable rows outside the
+    visible area. Fresh opens and filter changes now reset the list to the
+    first result.
   - Added deterministic validation for difficulty counts and order, full-course
     Black belt, and the native scroll setup.
 - **Day 4 round 8 (Sun Aug 24 morning is the deadline — finish Sat night):**
