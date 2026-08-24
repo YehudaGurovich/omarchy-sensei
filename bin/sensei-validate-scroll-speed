@@ -1,0 +1,54 @@
+#!/usr/bin/env node
+
+const fs = require("fs")
+const path = require("path")
+const childProcess = require("child_process")
+const vm = require("vm")
+
+const sourcePath = path.resolve(__dirname, "..", "Scroll.js")
+if (!fs.existsSync(sourcePath)) {
+  console.error("Scroll.js: missing fast-scroll policy")
+  process.exit(1)
+}
+
+const context = vm.createContext({})
+vm.runInContext(fs.readFileSync(sourcePath, "utf8"), context, { filename: sourcePath })
+const errors = []
+
+function expectEqual(actual, expected, message) {
+  if (actual !== expected) errors.push(`${message}: expected ${expected}, found ${actual}`)
+}
+
+expectEqual(context.contentDelta(8, 0, 78), 16, "touchpad pixels use 2x gain")
+expectEqual(context.contentDelta(-8, 0, 78), -16, "touchpad direction is preserved")
+expectEqual(context.contentDelta(0, 120, 78), 234, "one wheel notch moves three lesson rows")
+expectEqual(context.contentDelta(0, -120, 78), -234, "wheel direction is preserved")
+expectEqual(context.clampContentY(-20, 0, 1000), 0, "scrolling clamps at the top")
+expectEqual(context.clampContentY(1200, 0, 1000), 1000, "scrolling clamps at the bottom")
+expectEqual(context.clampContentY(420, 0, 1000), 420, "scrolling keeps in-range positions")
+
+if (errors.length) {
+  errors.forEach(error => console.error(error))
+  process.exit(1)
+}
+
+const qmlTestPath = path.resolve(__dirname, "tst_fast_scroll.qml")
+const qmlEnvironment = { ...process.env }
+delete qmlEnvironment.DISPLAY
+delete qmlEnvironment.WAYLAND_DISPLAY
+delete qmlEnvironment.QT_QPA_PLATFORMTHEME
+qmlEnvironment.QT_QPA_PLATFORM = "offscreen"
+qmlEnvironment.QT_QUICK_BACKEND = "software"
+
+const qmlTest = childProcess.spawnSync(
+  "/usr/lib/qt6/bin/qmltestrunner",
+  ["-input", qmlTestPath],
+  { encoding: "utf8", env: qmlEnvironment }
+)
+if (qmlTest.status !== 0) {
+  process.stderr.write(qmlTest.stdout || "")
+  process.stderr.write(qmlTest.stderr || "")
+  process.exit(qmlTest.status || 1)
+}
+
+console.log("Validated 2x touchpad gain and three-row wheel steps")

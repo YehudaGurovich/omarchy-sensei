@@ -1,6 +1,6 @@
 import QtQuick
 
-// Original penguin sensei mascot, drawn entirely in QML shapes.
+// Original Linux penguin sensei mascot, drawn entirely in QML shapes.
 // Fixed palette so the character reads the same on every theme.
 // The penguin blinks on its own; nod() bows once (step praise) and
 // celebrating loops a little hop (lesson complete).
@@ -43,6 +43,26 @@ Item {
     PauseAnimation { duration: 4300 }
     NumberAnimation { target: root; property: "eyeScale"; to: 0.15; duration: 70 }
     NumberAnimation { target: root; property: "eyeScale"; to: 1; duration: 110 }
+  }
+
+  // Wide orange feet make the mascot look more like the Linux penguin.
+  Rectangle {
+    x: 7 * root.s; y: 53 * root.s
+    width: 21 * root.s; height: 9 * root.s
+    radius: 4.5 * root.s
+    rotation: -7
+    color: "#f2a33c"
+    border.color: "#55000000"
+    border.width: Math.max(1, root.s)
+  }
+  Rectangle {
+    x: 36 * root.s; y: 53 * root.s
+    width: 21 * root.s; height: 9 * root.s
+    radius: 4.5 * root.s
+    rotation: 7
+    color: "#f2a33c"
+    border.color: "#55000000"
+    border.width: Math.max(1, root.s)
   }
 
   SequentialAnimation {
@@ -92,35 +112,41 @@ Item {
     border.width: Math.max(1, 1 * root.s)
   }
 
-  // belly
+  // Pear-shaped cream front: a small chest over the broad Linux penguin belly.
   Rectangle {
-    x: 19 * root.s; y: 26 * root.s
-    width: 26 * root.s; height: 30 * root.s
-    radius: 13 * root.s
+    x: 16 * root.s; y: 34 * root.s
+    width: 32 * root.s; height: 24 * root.s
+    radius: 16 * root.s
+    color: "#f4f0e6"
+  }
+  Rectangle {
+    x: 20 * root.s; y: 26 * root.s
+    width: 24 * root.s; height: 22 * root.s
+    radius: 12 * root.s
     color: "#f4f0e6"
   }
 
   // eyes — height follows eyeScale around a fixed center, so blinks squash
   Rectangle {
-    x: 21 * root.s; y: (16 + 4.5 * (1 - root.eyeScale)) * root.s
-    width: 9 * root.s; height: 9 * root.s * root.eyeScale
-    radius: 4.5 * root.s
+    x: 20 * root.s; y: (15 + 5.5 * (1 - root.eyeScale)) * root.s
+    width: 11 * root.s; height: 11 * root.s * root.eyeScale
+    radius: 5.5 * root.s
     color: "#fafafa"
   }
   Rectangle {
-    x: 34 * root.s; y: (16 + 4.5 * (1 - root.eyeScale)) * root.s
-    width: 9 * root.s; height: 9 * root.s * root.eyeScale
-    radius: 4.5 * root.s
+    x: 33 * root.s; y: (15 + 5.5 * (1 - root.eyeScale)) * root.s
+    width: 11 * root.s; height: 11 * root.s * root.eyeScale
+    radius: 5.5 * root.s
     color: "#fafafa"
   }
   Rectangle {
-    x: 24.5 * root.s; y: (19 + 2 * (1 - root.eyeScale)) * root.s
+    x: 25 * root.s; y: (19 + 2 * (1 - root.eyeScale)) * root.s
     width: 4 * root.s; height: 4 * root.s * root.eyeScale
     radius: 2 * root.s
     color: "#1d2024"
   }
   Rectangle {
-    x: 37.5 * root.s; y: (19 + 2 * (1 - root.eyeScale)) * root.s
+    x: 38 * root.s; y: (19 + 2 * (1 - root.eyeScale)) * root.s
     width: 4 * root.s; height: 4 * root.s * root.eyeScale
     radius: 2 * root.s
     color: "#1d2024"
@@ -141,6 +167,12 @@ Item {
     radius: 2 * root.s
     rotation: 45
     color: "#f2a33c"
+  }
+  Rectangle {
+    x: 29.5 * root.s; y: 29 * root.s
+    width: 7 * root.s; height: 4 * root.s
+    radius: 2 * root.s
+    color: "#d9822b"
   }
 
   // headband

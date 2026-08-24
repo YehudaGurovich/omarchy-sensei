@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "io.github.yehudagurovich.sensei",
   "name": "Omarchy Dojo",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "author": "YehudaGurovich",
   "license": "MIT",
   "description": "The Omarchy Dojo teaches desktop skills by doing. It reads your real keybindings, verifies each action, and leads from Easy lessons to Hard workflows.",
@@ -14,7 +14,7 @@
   },
   "barWidget": {
     "displayName": "Omarchy Dojo",
-    "description": "One-click Omarchy training with a nine-belt path.",
+    "description": "One-click Omarchy training with a nine-belt XP path.",
     "category": "Learning",
     "allowMultiple": false,
     "defaultSection": "right"

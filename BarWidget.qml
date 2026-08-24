@@ -10,7 +10,10 @@ BarWidget {
   id: root
   moduleName: "io.github.yehudagurovich.sensei"
 
-  readonly property var belt: Dojo.beltFor(progress.completed.length, Lessons.learningPath().length)
+  readonly property var learningPath: Lessons.learningPath()
+  readonly property int courseXp: Dojo.totalXp(root.learningPath)
+  readonly property int earnedXp: Dojo.xpForCompleted(progress.completed, root.learningPath)
+  readonly property var belt: Dojo.beltFor(root.earnedXp, root.courseXp)
 
   Progress { id: progress }
 
@@ -22,7 +25,7 @@ BarWidget {
     anchors.fill: parent
     bar: root.bar
     tooltipText: "Omarchy Dojo — " + root.belt.name + " · " + root.belt.title + " · "
-      + progress.completed.length + " lessons mastered"
+      + root.earnedXp + " XP · " + progress.completed.length + " lessons mastered"
     iconComponent: Component {
       PenguinSensei {
         anchors.centerIn: parent

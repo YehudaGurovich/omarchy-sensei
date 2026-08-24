@@ -35,9 +35,14 @@ Item {
   property var praiseCaps: []
   property bool skipUsed: false
   property var completedIds: []
-  readonly property int lessonCount: Lessons.learningPath().length
-  readonly property var currentBelt: Dojo.beltFor(root.completedIds.length, root.lessonCount)
-  readonly property var nextBelt: Dojo.nextBeltFor(root.completedIds.length, root.lessonCount)
+  readonly property var learningPath: Lessons.learningPath()
+  readonly property int lessonCount: root.learningPath.length
+  readonly property int courseXp: Dojo.totalXp(root.learningPath)
+  readonly property int earnedXp: Dojo.xpForCompleted(root.completedIds, root.learningPath)
+  readonly property var currentBelt: Dojo.beltFor(root.earnedXp, root.courseXp)
+  readonly property var nextBelt: Dojo.nextBeltFor(root.earnedXp, root.courseXp)
+  readonly property real beltFill: Dojo.beltProgress(root.earnedXp, root.courseXp)
+  readonly property var beltXpRange: Dojo.beltXpRange(root.earnedXp, root.courseXp)
   // Window-local {x,y,w,h} of the region the current step highlights, or null.
   property var spotlightRect: null
   property string spotlightNs: ""
@@ -177,12 +182,12 @@ Item {
 
   function beltSummary(includeNext) {
     var text = root.currentBelt.name + " · " + root.currentBelt.title + " · "
-      + root.completedIds.length + " of " + root.lessonCount + " mastered"
-    if (includeNext && root.nextBelt) {
-      var remaining = Dojo.lessonsUntilNextBelt(root.completedIds.length, root.lessonCount)
-      text += " · " + remaining + " to " + root.nextBelt.name
-    } else if (includeNext) {
-      text += " · Course mastered"
+    if (root.nextBelt) {
+      text += root.beltXpRange.earnedInStage + " / "
+        + root.beltXpRange.requiredForStage + " XP"
+      if (includeNext) text += " · " + root.nextBelt.name + " next"
+    } else {
+      text += root.earnedXp + " XP · Course mastered"
     }
     return text
   }
@@ -1051,6 +1056,13 @@ Item {
             interactive: contentHeight > height
             reuseItems: true
             cacheBuffer: Math.max(0, height * 2)
+
+            FastScrollHandler {
+              id: fastScroll
+              flickable: lessonList
+              rowHeight: Style.space(78)
+            }
+
             ScrollBar.vertical: ScrollBar {
               policy: ScrollBar.AsNeeded
               interactive: true
@@ -1087,7 +1099,8 @@ Item {
               radius: root.cornerRadius
               readonly property int accentGutter: Style.space(18)
               readonly property bool selected: model.index === root.selectedIndex
-              readonly property bool hovered: lessonHover.hovered && !lessonList.moving
+              readonly property bool hovered: lessonHover.hovered
+                && !fastScroll.inputActive && !lessonList.moving
               readonly property color rowText: selected ? root.selectedText : root.foreground
               color: selected ? root.selectedBackground
                 : hovered ? Qt.alpha(root.selectedBackground, 0.14) : Qt.alpha(root.border, 0.08)
@@ -1187,7 +1200,8 @@ Item {
                 id: lessonHover
                 cursorShape: Qt.PointingHandCursor
                 onHoveredChanged: {
-                  if (hovered && !lessonList.moving) root.selectedIndex = model.index
+                  if (hovered && !fastScroll.inputActive && !lessonList.moving)
+                    root.selectedIndex = model.index
                 }
               }
 
@@ -1195,7 +1209,10 @@ Item {
                 onTapped: root.activateIndex(model.index)
               }
 
-              Behavior on color { ColorAnimation { duration: 140 } }
+              Behavior on color {
+                enabled: !fastScroll.inputActive
+                ColorAnimation { duration: 140 }
+              }
             }
           }
         }
@@ -1210,8 +1227,7 @@ Item {
             radius: height / 2
             color: Qt.alpha(root.border, 0.45)
             Rectangle {
-              width: root.lessonCount
-                ? parent.width * root.completedIds.length / root.lessonCount : 0
+              width: parent.width * root.beltFill
               height: parent.height
               radius: parent.radius
               color: root.currentBelt.color

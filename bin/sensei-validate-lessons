@@ -163,21 +163,67 @@ Object.keys(expectedDifficultyCounts).forEach(level => {
     fail("LESSONS", `expected ${expectedDifficultyCounts[level]} difficulty-${level} lessons, found ${difficultyCounts[level]}`)
 })
 
-const expectedBeltThresholds = [0, 4, 8, 12, 16, 20, 24, 28, 33]
+const expectedCourseXp = 680
+const expectedBeltThresholds = [0, 10, 30, 60, 110, 190, 290, 440, 680]
+const xpFunctions = [
+  "xpForLesson", "totalXp", "xpForCompleted", "beltXpThreshold",
+  "beltFor", "nextBeltFor", "xpUntilNextBelt", "beltProgress"
+]
+xpFunctions.forEach(name => {
+  if (typeof context[name] !== "function") fail("BELTS", `missing XP function ${name}`)
+})
 if (!Array.isArray(context.BELTS) || context.BELTS.length !== 9) {
   fail("BELTS", "expected nine belt levels")
-} else {
+} else if (xpFunctions.every(name => typeof context[name] === "function")) {
+  const courseXp = context.totalXp(course)
+  if (courseXp !== expectedCourseXp)
+    fail("BELTS", `expected ${expectedCourseXp} total course XP, found ${courseXp}`)
   expectedBeltThresholds.forEach((threshold, index) => {
-    if (context.beltThreshold(index, expectedLessonCount) !== threshold)
-      fail("BELTS", `expected ${context.BELTS[index].name} at ${threshold} mastered lessons`)
+    if (context.beltXpThreshold(index, courseXp) !== threshold)
+      fail("BELTS", `expected ${context.BELTS[index].name} at ${threshold} XP`)
     if (typeof context.BELTS[index].title !== "string" || !context.BELTS[index].title)
       fail("BELTS", `belt ${index} needs an Omarchy title`)
   })
+  const stageCosts = expectedBeltThresholds.slice(1).map((threshold, index) =>
+    threshold - expectedBeltThresholds[index]
+  )
+  for (let index = 1; index < stageCosts.length; index++) {
+    if (stageCosts[index] <= stageCosts[index - 1])
+      fail("BELTS", "each belt must need more XP than the belt before it")
+  }
+  const lessonsPerStage = []
+  let lessonIndex = 0
+  let cumulativeXp = 0
+  expectedBeltThresholds.slice(1).forEach(threshold => {
+    const stageStart = lessonIndex
+    while (lessonIndex < course.length && cumulativeXp < threshold) {
+      cumulativeXp += context.xpForLesson(course[lessonIndex])
+      lessonIndex++
+    }
+    if (cumulativeXp !== threshold)
+      fail("BELTS", `${threshold} XP must end at a lesson boundary`)
+    lessonsPerStage.push(lessonIndex - stageStart)
+  })
+  for (let index = 1; index < lessonsPerStage.length; index++) {
+    if (lessonsPerStage[index] < lessonsPerStage[index - 1])
+      fail("BELTS", "a later belt must not need fewer lessons")
+  }
+  const sampleXp = context.xpForCompleted(
+    ["welcome-tour", "scratchpad", "focus-sprint"], course
+  )
+  if (sampleXp !== 60)
+    fail("BELTS", `expected the lesson difficulty sample to earn 60 XP, found ${sampleXp}`)
+  if (context.beltFor(80, courseXp).name !== "Green belt")
+    fail("BELTS", "80 XP must award Green belt")
+  if (Math.abs(context.beltProgress(80, courseXp) - 0.4) > 0.0001)
+    fail("BELTS", "80 XP must fill two fifths of the Green-to-Blue XP bar")
+  if (context.xpUntilNextBelt(80, courseXp) !== 30)
+    fail("BELTS", "80 XP must leave 30 XP to Blue belt")
+  if (context.beltFor(courseXp - 1, courseXp).name === "Black belt")
+    fail("BELTS", "Black belt must require full course XP")
+  if (context.beltFor(courseXp, courseXp).name !== "Black belt")
+    fail("BELTS", "full course XP must award Black belt")
 }
-if (context.beltFor(expectedLessonCount - 1, expectedLessonCount).name === "Black belt")
-  fail("BELTS", "Black belt must require full course mastery")
-if (context.beltFor(expectedLessonCount, expectedLessonCount).name !== "Black belt")
-  fail("BELTS", "full course mastery must award Black belt")
 
 if (errors.length) {
   errors.forEach(error => console.error(error))

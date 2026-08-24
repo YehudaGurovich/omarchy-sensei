@@ -204,16 +204,23 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
     Runtime course order is now Easy → Medium → Hard while authored topic
     groups stay readable in the lesson data file.
   - Spread nine Omarchy-titled belts across the complete course. White starts
-    at zero, intermediate belts advance at even thresholds, and Black requires
-    all 33 lessons. The old points field remains for schema compatibility but
-    is no longer a second visible rank ladder.
+    at zero. Version 1.6.0 made Hard lessons give more XP. Each later belt
+    costs more XP and never needs fewer lessons. Black requires all 680
+    course XP. The old
+    points field remains for schema compatibility.
   - Replaced the custom non-interactive scroll track with the native Omarchy
     Qt Quick scrollbar and stock flick behavior. Replaced each row's
     MouseArea with pointer handlers, and prepared reusable rows outside the
     visible area. Fresh opens and filter changes now reset the list to the
     first result.
-  - Added deterministic validation for difficulty counts and order, full-course
+  - Added repeatable validation for difficulty counts and order, full-course
     Black belt, and the native scroll setup.
+  - Version 1.6.0 added explicit fast scrolling for both touchpads and mouse
+    wheels, with a repeatable scroll-speed test. Hover effects pause during
+    scroll input.
+  - Version 1.6.0 kept the flat mascot style and added clear Linux penguin
+    traits: broad orange feet, a pear-shaped belly, larger eyes, and a two-part
+    beak.
 - **Day 4 round 8 (Sun Aug 24 morning is the deadline — finish Sat night):**
   preview.png refresh, fresh-install test, submit form.
 

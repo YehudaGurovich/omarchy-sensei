@@ -146,21 +146,22 @@ Contributions of new lessons are welcome.
 
 ## The Omarchy Dojo
 
-Sensei is a penguin master with a white beard and an earned-color headband
-and sash. The bar symbol, dojo mascot, and coach mascot change color with
-your current belt. Completing lessons — without skipping steps — raises your
-belt from White toward Black. There are nine belts. Each also has an Omarchy
-title: Fresh Install, Workspace Scout, Window Tiler, Menu Navigator, Desktop
-Shaper, System Keeper, Workflow Adept, Omarchy Operator, and Omarchy Sensei.
-The stages are spread across the full course; Black belt requires all 33
-lessons. Progress persists across restarts
+Sensei keeps the flat dojo style but now has the broad orange feet, cream
+belly, round body, and large eyes of the Linux penguin. The headband and sash
+use the current belt color. Completing lessons without skipping earns 10 XP for
+Easy, 20 XP for Medium, and 30 XP for Hard. There are nine belts. Each has an
+Omarchy title: Fresh Install, Workspace Scout, Window Tiler, Menu Navigator,
+Desktop Shaper, System Keeper, Workflow Adept, Omarchy Operator, and Omarchy
+Sensei. Every belt needs more XP than the belt before it. A later belt never
+needs fewer lessons. The bar shows XP inside the current belt, and Black
+requires the full 680 course XP. Progress persists across restarts
 (`~/.local/state/omarchy-sensei/progress.json`). Every completion screen
 suggests the next unmastered lesson on the Easy-to-Hard path. Training happens
 in a compact coach card while the desktop keeps keyboard focus.
 
 ## Status
 
-Version 1.5.0 — the walkthrough engine works end to end: live key
+Version 1.6.0 — the walkthrough engine works end to end: live key
 resolution (including Lua `code:` binds via the compiled keymap),
 event-driven step completion (multi-monitor aware), spotlight highlighting,
 persistent progress and belts, and the coach card. Thirty-three lessons and 136
@@ -173,15 +174,15 @@ Recent additions:
 
 - **Omarchy Dojo progression.** The browser, bar tooltip, and completion card
   now use the Omarchy Dojo name. Nine Omarchy-titled belts span all 33 lessons,
-  and Black belt requires full course mastery.
+  each later belt costs more XP, and Black requires full course mastery.
 - **A consistent Easy-to-Hard path.** One difficulty scale applies to every
   lesson. The default order contains all Easy lessons first, then Medium,
   then Hard.
 - **Native scrolling.** The lesson list uses Omarchy's normal interactive
-  scrollbar and flick behavior. Lesson taps and hover tracking no longer sit
-  between touchpad gestures and the list. Nearby rows are prepared and reused
-  instead of being rebuilt during a scroll. A fresh open starts at the top,
-  and filters reset the view to their first result.
+  scrollbar with a tested 2× touchpad gain and a three-card mouse-wheel step.
+  Hover effects pause while you scroll. Nearby rows are
+  prepared and reused. A fresh open starts at the top, and filters reset the
+  view to their first result.
 - **Twenty-one advanced workflows.** The course now teaches Super + Space menu
   navigation, Super + Ctrl + K, silent window moves, focus and swap, resizing,
   screen-space controls, layouts, themes, Stay Awake, suspend/resume, plugins,
@@ -197,8 +198,8 @@ Recent additions:
   lesson ends with a skill-specific result. Two guided circuits combine six
   actions each into a full focus workflow and a daily-tools workout.
 - **Belt-aware mascot.** The penguin's headband and sash use the earned belt
-  color in the bar, dojo, and coach. The bar watches progress changes and
-  updates without a shell restart.
+  color in the bar, dojo, and coach. Its feet, belly, eyes, and beak make it
+  look like the Linux penguin. The bar updates without a shell restart.
 - **More spotlight anchors.** Steps can ring the focused window and the
   open menu/emoji/clipboard overlays, not just the bar.
 - **Live feedback.** The instant the compositor event fires, the keys you
@@ -224,6 +225,7 @@ Validate the lesson schema, course progression, belts, and scrolling setup:
 ```sh
 ./bin/sensei-validate-lessons
 ./bin/sensei-validate-ui
+./bin/sensei-validate-scroll-speed
 ```
 
 ## License
