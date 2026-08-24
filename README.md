@@ -179,7 +179,8 @@ Recent additions:
   then Hard.
 - **Native scrolling.** The lesson list uses Omarchy's normal interactive
   scrollbar and flick behavior. Rows no longer replay entrance animations as
-  they are created during scrolling.
+  they are created during scrolling. A fresh open starts at the top, and
+  filters reset the view to their first result.
 - **Twenty-one advanced workflows.** The course now teaches Super + Space menu
   navigation, Super + Ctrl + K, silent window moves, focus and swap, resizing,
   screen-space controls, layouts, themes, Stay Awake, suspend/resume, plugins,

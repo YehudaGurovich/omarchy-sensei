@@ -209,7 +209,8 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
     is no longer a second visible rank ladder.
   - Replaced the custom non-interactive scroll track with the native Omarchy
     Qt Quick scrollbar and stock flick behavior. Removed delegate entrance
-    animations that replayed as rows were created during scrolling.
+    animations that replayed as rows were created during scrolling. Fresh
+    opens and filter changes now reset the list to the first result.
   - Added deterministic validation for difficulty counts and order, full-course
     Black belt, and the native scroll setup.
 - **Day 4 round 8 (Sun Aug 24 morning is the deadline — finish Sat night):**

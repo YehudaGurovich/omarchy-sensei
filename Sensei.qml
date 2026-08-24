@@ -92,7 +92,7 @@ Item {
     root.opened = true
     root.filterText = ""
     root.selectedIndex = 0
-    root.rebuildDisplay()
+    root.rebuildDisplay(true)
     Qt.callLater(function() {
       root.centerDojo()
       keyCatcher.forceActiveFocus()
@@ -124,7 +124,7 @@ Item {
     else root.open("{}")
   }
 
-  function rebuildDisplay() {
+  function rebuildDisplay(resetView) {
     var lessons = Lessons.search(root.filterText).filter(function(lesson) {
       if (root.difficultyFilter && lesson.difficulty !== root.difficultyFilter) return false
       var mastered = root.completedIds.indexOf(lesson.id) !== -1
@@ -147,24 +147,28 @@ Item {
       })
     }
     if (root.selectedIndex >= displayModel.count) root.selectedIndex = Math.max(0, displayModel.count - 1)
+    Qt.callLater(function() {
+      if (resetView) lessonList.positionViewAtBeginning()
+      else if (displayModel.count) lessonList.positionViewAtIndex(root.selectedIndex, ListView.Contain)
+    })
   }
 
   function setFilter(text) {
     root.filterText = text
     root.selectedIndex = 0
-    root.rebuildDisplay()
+    root.rebuildDisplay(true)
   }
 
   function setDifficulty(value) {
     root.difficultyFilter = value
     root.selectedIndex = 0
-    root.rebuildDisplay()
+    root.rebuildDisplay(true)
   }
 
   function setMastery(value) {
     root.masteryFilter = value
     root.selectedIndex = 0
-    root.rebuildDisplay()
+    root.rebuildDisplay(true)
   }
 
   function difficultyName(value) {
