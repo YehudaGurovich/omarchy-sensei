@@ -217,10 +217,12 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
     Black belt, and the native scroll setup.
   - Version 1.6.0 added explicit fast scrolling for both touchpads and mouse
     wheels, with a repeatable scroll-speed test. Hover effects pause during
-    scroll input.
+    scroll input. Mouse-wheel steps now use a short, smooth motion. Touchpad
+    scrolling uses a shorter motion to stay responsive.
   - Version 1.6.0 kept the flat mascot style and added clear Linux penguin
-    traits: broad orange feet, a pear-shaped belly, larger eyes, and a two-part
-    beak.
+    traits: broad orange feet, a pear-shaped belly, tall face patches, and a
+    broad two-part beak. The header uses the official Omarchy logo, and the
+    bar hover text shows only the Dojo name and total XP progress.
 - **Day 4 round 8 (Sun Aug 24 morning is the deadline — finish Sat night):**
   preview.png refresh, fresh-install test, submit form.
 

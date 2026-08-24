@@ -772,13 +772,27 @@ Item {
             }
           }
 
+          // Square Omarchy O from the built-in Omarchy icon font.
+          Text {
+            anchors.right: headerGrip.left
+            anchors.rightMargin: root.contentSpacing
+            anchors.verticalCenter: parent.verticalCenter
+            width: Style.space(30)
+            height: width
+            text: "\ue900"
+            color: root.foreground
+            opacity: 0.62
+            font.family: "omarchy"
+            font.pixelSize: Style.space(26)
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+          }
+
           Row {
+            id: headerGrip
             anchors.right: closeButton.left
             anchors.rightMargin: root.contentSpacing
             anchors.verticalCenter: parent.verticalCenter
-            spacing: Style.space(6)
-
-            Rectangle { width: Style.space(18); height: 1; color: Qt.alpha(root.border, 0.7) }
             Text {
               text: "DRAG TO MOVE"
               color: root.foreground

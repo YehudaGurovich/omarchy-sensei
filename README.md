@@ -147,8 +147,9 @@ Contributions of new lessons are welcome.
 ## The Omarchy Dojo
 
 Sensei keeps the flat dojo style but now has the broad orange feet, cream
-belly, round body, and large eyes of the Linux penguin. The headband and sash
-use the current belt color. Completing lessons without skipping earns 10 XP for
+belly, round body, tall face patches, and broad beak of the Linux penguin. The
+headband and sash use the current belt color. The Dojo header also uses the
+official Omarchy logo. Completing lessons without skipping earns 10 XP for
 Easy, 20 XP for Medium, and 30 XP for Hard. There are nine belts. Each has an
 Omarchy title: Fresh Install, Workspace Scout, Window Tiler, Menu Navigator,
 Desktop Shaper, System Keeper, Workflow Adept, Omarchy Operator, and Omarchy
@@ -180,6 +181,8 @@ Recent additions:
   then Hard.
 - **Native scrolling.** The lesson list uses Omarchy's normal interactive
   scrollbar with a tested 2× touchpad gain and a three-card mouse-wheel step.
+  Mouse-wheel steps use a short, smooth motion. Touchpad scrolling uses a
+  shorter motion to stay responsive.
   Hover effects pause while you scroll. Nearby rows are
   prepared and reused. A fresh open starts at the top, and filters reset the
   view to their first result.
@@ -216,7 +219,8 @@ Recent additions:
 - **Hint escalation.** A step that waits ~30 seconds shows extra help: the
   step's own hint if it has one, otherwise an honest way out.
 - **A penguin in your bar.** Omarchy Dojo ships a bar widget: one click opens the
-  dojo, and a first-time button starts the welcome tour.
+  dojo, and a first-time button starts the welcome tour. Its hover text shows
+  only the Dojo name and total XP progress.
 
 ## Development
 

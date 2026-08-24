@@ -38,11 +38,15 @@ TestCase {
 
   function test_three_rows_per_wheel_notch() {
     fastScroll.applyInput(0, -120)
-    compare(list.contentY, 234)
+    verify(list.contentY < 234)
+    tryVerify(function() { return list.contentY > 0 }, 100)
+    wait(30)
+    verify(list.contentY < 234)
     verify(fastScroll.inputActive)
 
     fastScroll.applyInput(0, -120)
-    compare(list.contentY, 468)
+    verify(list.contentY < 468)
+    tryCompare(list, "contentY", 468, 400)
     verify(fastScroll.inputActive)
 
     tryVerify(function() { return !fastScroll.inputActive }, 500)
@@ -51,5 +55,15 @@ TestCase {
   function test_top_clamp() {
     fastScroll.applyInput(0, 120)
     compare(list.contentY, 0)
+  }
+
+  function test_touchpad_pixels_use_short_motion() {
+    fastScroll.applyInput(-8, 0)
+    verify(list.contentY < 16)
+    tryVerify(function() { return list.contentY > 0 }, 100)
+
+    fastScroll.applyInput(-8, 0)
+    verify(list.contentY < 32)
+    tryCompare(list, "contentY", 32, 200)
   }
 }

@@ -126,29 +126,30 @@ Item {
     color: "#f4f0e6"
   }
 
-  // eyes — height follows eyeScale around a fixed center, so blinks squash
+  // Large cream face patches and small pupils match the Linux penguin.
+  // Their height follows eyeScale around a fixed center, so blinks squash.
   Rectangle {
-    x: 20 * root.s; y: (15 + 5.5 * (1 - root.eyeScale)) * root.s
-    width: 11 * root.s; height: 11 * root.s * root.eyeScale
-    radius: 5.5 * root.s
-    color: "#fafafa"
+    x: 19 * root.s; y: (12 + 9 * (1 - root.eyeScale)) * root.s
+    width: 13 * root.s; height: 18 * root.s * root.eyeScale
+    radius: 6.5 * root.s
+    color: "#f4f0e6"
   }
   Rectangle {
-    x: 33 * root.s; y: (15 + 5.5 * (1 - root.eyeScale)) * root.s
-    width: 11 * root.s; height: 11 * root.s * root.eyeScale
-    radius: 5.5 * root.s
-    color: "#fafafa"
+    x: 32 * root.s; y: (12 + 9 * (1 - root.eyeScale)) * root.s
+    width: 13 * root.s; height: 18 * root.s * root.eyeScale
+    radius: 6.5 * root.s
+    color: "#f4f0e6"
   }
   Rectangle {
-    x: 25 * root.s; y: (19 + 2 * (1 - root.eyeScale)) * root.s
-    width: 4 * root.s; height: 4 * root.s * root.eyeScale
-    radius: 2 * root.s
+    x: 26 * root.s; y: (20 + 2.25 * (1 - root.eyeScale)) * root.s
+    width: 4.5 * root.s; height: 4.5 * root.s * root.eyeScale
+    radius: 2.25 * root.s
     color: "#1d2024"
   }
   Rectangle {
-    x: 38 * root.s; y: (19 + 2 * (1 - root.eyeScale)) * root.s
-    width: 4 * root.s; height: 4 * root.s * root.eyeScale
-    radius: 2 * root.s
+    x: 34 * root.s; y: (20 + 2.25 * (1 - root.eyeScale)) * root.s
+    width: 4.5 * root.s; height: 4.5 * root.s * root.eyeScale
+    radius: 2.25 * root.s
     color: "#1d2024"
   }
 
@@ -162,15 +163,15 @@ Item {
 
   // beak
   Rectangle {
-    x: 28 * root.s; y: 24 * root.s
-    width: 8 * root.s; height: 8 * root.s
-    radius: 2 * root.s
+    x: 27 * root.s; y: 24 * root.s
+    width: 10 * root.s; height: 10 * root.s
+    radius: 2.5 * root.s
     rotation: 45
     color: "#f2a33c"
   }
   Rectangle {
-    x: 29.5 * root.s; y: 29 * root.s
-    width: 7 * root.s; height: 4 * root.s
+    x: 28 * root.s; y: 30 * root.s
+    width: 9 * root.s; height: 4 * root.s
     radius: 2 * root.s
     color: "#d9822b"
   }

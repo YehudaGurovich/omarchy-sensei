@@ -4,6 +4,7 @@ const fs = require("fs")
 const path = require("path")
 
 const source = fs.readFileSync(path.resolve(__dirname, "..", "Sensei.qml"), "utf8")
+const barSource = fs.readFileSync(path.resolve(__dirname, "..", "BarWidget.qml"), "utf8")
 const fastScrollSource = fs.readFileSync(
   path.resolve(__dirname, "..", "FastScrollHandler.qml"), "utf8")
 const errors = []
@@ -44,6 +45,10 @@ requirePattern(/HoverHandler\s*\{[\s\S]*?if\s*\(hovered\s*&&\s*!fastScroll\.inpu
 requirePattern(/TapHandler\s*\{[\s\S]*?root\.activateIndex\(model\.index\)/, "keep lesson rows clickable without consuming scroll gestures")
 requirePattern(/FastScrollHandler\s*\{[\s\S]*?flickable:\s*lessonList/, "apply the tested fast-scroll handler to the lesson list")
 requirePattern(/Behavior on color\s*\{\s*enabled:\s*!fastScroll\.inputActive/, "disable lesson-row color animation during scroll input")
+if (!source.includes('text: "\\ue900"') || !/font\.family:\s*"omarchy"/.test(source))
+  errors.push("show the square Omarchy logo in the dojo")
+if (!/tooltipText:\s*"Omarchy Dojo · "\s*\+\s*root\.earnedXp\s*\+\s*" \/ "\s*\+\s*root\.courseXp\s*\+\s*" XP"/.test(barSource))
+  errors.push("BarWidget.qml: keep the bar hover text to the dojo name and total XP")
 
 if (errors.length) {
   errors.forEach(error => console.error(`Sensei.qml: ${error}`))

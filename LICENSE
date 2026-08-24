@@ -29,5 +29,5 @@ Third-party notices and dependencies:
   part of Omarchy (https://github.com/basecamp/omarchy), MIT License,
   Copyright Omarchy contributors.
 - Runtime dependencies, all shipped with Omarchy Quattro: hyprctl
-  (Hyprland), bash, gawk, lua, xkbcli (libxkbcommon), and the Quickshell
-  runtime hosting the plugin. No dependencies are bundled.
+  (Hyprland), bash, gawk, lua, xkbcli (libxkbcommon), the Omarchy icon font,
+  and the Quickshell runtime hosting the plugin. No dependencies are bundled.

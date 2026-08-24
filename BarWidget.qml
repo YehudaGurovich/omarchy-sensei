@@ -24,8 +24,7 @@ BarWidget {
     id: button
     anchors.fill: parent
     bar: root.bar
-    tooltipText: "Omarchy Dojo — " + root.belt.name + " · " + root.belt.title + " · "
-      + root.earnedXp + " XP · " + progress.completed.length + " lessons mastered"
+    tooltipText: "Omarchy Dojo · " + root.earnedXp + " / " + root.courseXp + " XP"
     iconComponent: Component {
       PenguinSensei {
         anchors.centerIn: parent
