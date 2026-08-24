@@ -201,7 +201,6 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
 
 ```sh
 ./dev.sh          # sync repo -> ~/.config/omarchy/plugins/<id> and restart the shell
-./dev.sh --hot    # sync only; file watcher reloads (fast, crash-prone, stale IPC)
 omarchy-shell shell toggle io.github.yehudagurovich.sensei '{}'
 ```
 
@@ -209,6 +208,9 @@ Logs: `qs list --all` for the instance id, then `qs log -i <id>`.
 
 Gotchas learned while testing:
 
+- `dev.sh` refuses to write plugin files while the session is locked. File
+  churn previously queued reloads that made lock recovery show surfaces before
+  Quickshell held an active Wayland session lock, which caused a SIGABRT.
 - Hot reload re-creates the plugin but the OLD IpcHandler keeps answering
   (`Handler was registered but will not be used` in the log). Any change to
   IPC-visible behavior needs `omarchy restart shell` before `omarchy-shell
@@ -224,9 +226,9 @@ Gotchas learned while testing:
   blaming the plugin. Confirmed twice by coredump: the crash is
   `IpcHandler::onPostReload` → `__dynamic_cast`, and it can fire up to a
   minute AFTER a dev.sh sync (queued plugin-reload events from the rsync
-  file churn). `dev.sh` does not request an additional explicit rescan; the
-  shell's debounced file watcher reloads after the sync. After syncing, wait
-  for the instance to settle before driving lessons.
+  file churn). `dev.sh` now refuses locked sessions, does not request an
+  additional explicit rescan, and restarts the shell after syncing. After
+  syncing, wait for the instance to settle before driving lessons.
 - ANY file write inside ANY local plugin's directory triggers the shell's
   `reloadPlugins()` → `unloadPanels()` → `close()` on every panel plugin —
   which ends an in-flight lesson. Plugins must never write state into
