@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Ui
 import "Dojo.js" as Dojo
+import "lessons/lessons.js" as Lessons
 
 // One-click dojo access from the bar: the penguin sensei as an icon
 // button. Clicking toggles the lesson browser — the beginner-friendly
@@ -9,7 +10,7 @@ BarWidget {
   id: root
   moduleName: "io.github.yehudagurovich.sensei"
 
-  readonly property var belt: Dojo.beltFor(progress.completed.length)
+  readonly property var belt: Dojo.beltFor(progress.completed.length, Lessons.all().length)
 
   Progress { id: progress }
 
@@ -20,7 +21,7 @@ BarWidget {
     id: button
     anchors.fill: parent
     bar: root.bar
-    tooltipText: "Sensei — " + root.belt.name + " · "
+    tooltipText: "Omarchy Dojo — " + root.belt.name + " · " + root.belt.title + " · "
       + progress.completed.length + " lessons mastered"
     iconComponent: Component {
       PenguinSensei {

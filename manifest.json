@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "id": "io.github.yehudagurovich.sensei",
-  "name": "Sensei",
-  "version": "1.4.0",
+  "name": "Omarchy Dojo",
+  "version": "1.5.0",
   "author": "YehudaGurovich",
   "license": "MIT",
-  "description": "Interactive, do-it-yourself tutorials for Omarchy. Ask how to do something, then learn by doing it — Sensei reads your real keybindings and waits until you actually perform each step.",
+  "description": "The Omarchy Dojo teaches desktop skills by doing. It reads your real keybindings, verifies each action, and leads from Easy lessons to Hard workflows.",
   "kinds": ["overlay", "bar-widget"],
   "keepLoaded": true,
   "entryPoints": {
@@ -13,8 +13,8 @@
     "barWidget": "BarWidget.qml"
   },
   "barWidget": {
-    "displayName": "Sensei",
-    "description": "One-click dojo: learn Omarchy by doing.",
+    "displayName": "Omarchy Dojo",
+    "description": "One-click Omarchy training with a nine-belt path.",
     "category": "Learning",
     "allowMultiple": false,
     "defaultSection": "right"

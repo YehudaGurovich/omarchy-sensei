@@ -1,27 +1,15 @@
-// Dojo flavor: belt progression, point ranks, and the sensei's voice.
+// Omarchy Dojo belt progression and the sensei's voice.
 
 var BELTS = [
-  { name: "White belt", color: "#f5f5f5" },
-  { name: "Yellow belt", color: "#f2c14e" },
-  { name: "Orange belt", color: "#e8833a" },
-  { name: "Green belt", color: "#57a05b" },
-  { name: "Blue belt", color: "#4a90d9" },
-  { name: "Red belt", color: "#d94f4f" },
-  { name: "Purple belt", color: "#8f5fd7" },
-  { name: "Brown belt", color: "#7a5230" },
-  { name: "Black belt", color: "#1a1a1a" }
-]
-
-// Ranks are earned with points: 10 x lesson difficulty per first mastery.
-// Keep these thresholds stable as lessons are added so existing progress never
-// loses a rank. The larger course continues beyond the first Sensei rank.
-var RANKS = [
-  { name: "Grasshopper", points: 0 },
-  { name: "Student", points: 20 },
-  { name: "Disciple", points: 50 },
-  { name: "Monk", points: 80 },
-  { name: "Master", points: 110 },
-  { name: "Sensei", points: 180 }
+  { name: "White belt", title: "Fresh Install", color: "#f5f5f5" },
+  { name: "Yellow belt", title: "Workspace Scout", color: "#f2c14e" },
+  { name: "Orange belt", title: "Window Tiler", color: "#e8833a" },
+  { name: "Green belt", title: "Menu Navigator", color: "#57a05b" },
+  { name: "Blue belt", title: "Desktop Shaper", color: "#4a90d9" },
+  { name: "Red belt", title: "System Keeper", color: "#d94f4f" },
+  { name: "Purple belt", title: "Workflow Adept", color: "#8f5fd7" },
+  { name: "Brown belt", title: "Omarchy Operator", color: "#7a5230" },
+  { name: "Black belt", title: "Omarchy Sensei", color: "#1a1a1a" }
 ]
 
 var STEP_PRAISE = [
@@ -37,19 +25,38 @@ var STEP_PRAISE = [
   "You begin to see the workspaces behind the workspaces."
 ]
 
-function beltFor(completedCount) {
-  var i = Math.min(completedCount, BELTS.length - 1)
-  return BELTS[i]
+// Eight even training stages lead to Black belt. Black is reserved for full
+// course mastery, so a larger course cannot make the final belt arrive early.
+function beltThreshold(index, totalLessons) {
+  var total = Math.max(1, Number(totalLessons) || 1)
+  if (index >= BELTS.length - 1) return total
+  return Math.ceil(index * (total - 1) / (BELTS.length - 1))
 }
 
-function rankFor(points) {
-  var rank = RANKS[0]
-  for (var i = 0; i < RANKS.length; i++) {
-    if (points >= RANKS[i].points) rank = RANKS[i]
+function beltFor(completedCount, totalLessons) {
+  var completed = Math.max(0, Number(completedCount) || 0)
+  var belt = BELTS[0]
+  for (var i = 1; i < BELTS.length; i++) {
+    if (completed >= beltThreshold(i, totalLessons)) belt = BELTS[i]
   }
-  return rank
+  return belt
 }
 
+function nextBeltFor(completedCount, totalLessons) {
+  var current = beltFor(completedCount, totalLessons)
+  var index = BELTS.indexOf(current)
+  return index >= 0 && index + 1 < BELTS.length ? BELTS[index + 1] : null
+}
+
+function lessonsUntilNextBelt(completedCount, totalLessons) {
+  var current = beltFor(completedCount, totalLessons)
+  var index = BELTS.indexOf(current)
+  if (index < 0 || index + 1 >= BELTS.length) return 0
+  return Math.max(0, beltThreshold(index + 1, totalLessons) - completedCount)
+}
+
+// Keep the legacy score current for progress-file compatibility. Belt
+// progression uses mastered lesson count, not points.
 function pointsFor(lesson) {
   return 10 * (lesson && lesson.difficulty ? lesson.difficulty : 1)
 }

@@ -1,4 +1,4 @@
-# Sensei — build plan
+# Omarchy Dojo — build plan
 
 Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
 
@@ -110,6 +110,9 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
     verified by review only — two 30-second live waits were both cut
     short (see gotchas below); the path shares its mechanics with the
     proven praise timer.
+  - Version 1.5.0 later retired the separate visible rank ladder. The points
+    field remains in progress schema version 1 for compatibility; the UI now
+    shows one nine-belt course progression.
   - Investigated and dropped for now: a resize lesson. Quattro has no
     resize submap — resizing is direct binds ("Expand window left",
     keycodes 20/21) — and no socket2 event for resize was confirmed
@@ -156,7 +159,7 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
 - **Day 4 round 5 — DONE (Aug 23): course-browser redesign (1.3.0).**
   - Replaced the narrow palette with a larger course browser. It has visible
     difficulty and mastery filters; lesson summaries with category, duration,
-    and step count; and a permanent scroll track plus an explicit overflow
+    and step count; and a visible scroll control plus an explicit overflow
     label. User review removed the sort row and widened the lesson accent
     gutter so the line cannot touch the text.
   - The dojo and coach cards can be dragged by their headers and stay inside
@@ -194,7 +197,22 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
   - Added a `sensei dismiss` IPC action. A normal Super+W close helper can now
     close the dojo or coach without using toggle, which could reopen a closed
     overlay.
-- **Day 4 round 7 (Sun Aug 24 morning is the deadline — finish Sat night):**
+- **Day 4 round 7 — DONE (Aug 24): Omarchy Dojo progression (1.5.0).**
+  - Renamed the visible product and bar widget to Omarchy Dojo. The stable
+    plugin id, IPC target, state path, and source filenames stay unchanged.
+  - Recalibrated all lessons with one rubric: 9 Easy, 16 Medium, and 8 Hard.
+    Runtime course order is now Easy → Medium → Hard while authored topic
+    groups stay readable in the lesson data file.
+  - Spread nine Omarchy-titled belts across the complete course. White starts
+    at zero, intermediate belts advance at even thresholds, and Black requires
+    all 33 lessons. The old points field remains for schema compatibility but
+    is no longer a second visible rank ladder.
+  - Replaced the custom non-interactive scroll track with the native Omarchy
+    Qt Quick scrollbar and stock flick behavior. Removed delegate entrance
+    animations that replayed as rows were created during scrolling.
+  - Added deterministic validation for difficulty counts and order, full-course
+    Black belt, and the native scroll setup.
+- **Day 4 round 8 (Sun Aug 24 morning is the deadline — finish Sat night):**
   preview.png refresh, fresh-install test, submit form.
 
 ## Dev loop
@@ -237,8 +255,9 @@ Gotchas learned while testing:
 
 ## Ideas backlog
 
-- ~~**Omarchy points / sensei ranks**~~ — DONE (Day 4 round 2): 10 ×
-  difficulty per first mastery, Grasshopper → Sensei ladder in Dojo.js.
+- ~~**Omarchy points / sensei ranks**~~ — built in Day 4 round 2, then replaced
+  in 1.5.0 by one nine-belt Omarchy Dojo path. The legacy points value remains
+  in progress schema version 1.
 - ~~**Hint escalation**~~ — DONE (Day 4 round 2): 30 s timer, per-step
   `hint` field with a generic fallback.
 - ~~**Belt path / curriculum (lite)**~~ — DONE (Day 4 round 2): list order

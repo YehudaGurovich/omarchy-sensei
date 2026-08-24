@@ -8,8 +8,10 @@
 //   category   short browser grouping label
 //   duration   estimated minutes for a first run
 //   outro      lesson-specific mastery message
-//   difficulty 1–3; first mastery awards 10 x difficulty points (Dojo.js
-//              keeps rank thresholds stable as the lesson pack grows)
+//   difficulty 1–3, using one course-wide scale:
+//              1 Easy — one safe feature with little setup
+//              2 Medium — related actions, setup, or manual confirmation
+//              3 Hard — multi-part or system-changing workflows
 //   steps      ordered list of Step
 //
 // Step:
@@ -145,7 +147,7 @@ var LESSONS = [
     keywords: ["move", "window", "workspace", "send"],
     category: "Windows",
     duration: 4,
-    difficulty: 2,
+    difficulty: 1,
     intro: "You can carry the focused window with you, or send it away silently.",
     outro: "You can now reorganize the desktop without dragging, dropping, or losing focus.",
     steps: [
@@ -193,7 +195,7 @@ var LESSONS = [
     keywords: ["float", "floating", "tile", "tiling", "toggle"],
     category: "Windows",
     duration: 3,
-    difficulty: 2,
+    difficulty: 1,
     intro: "Tiled windows share the screen; floating windows sit on top, free to move.",
     outro: "You can choose structure for normal work and free placement for temporary tools.",
     steps: [
@@ -247,7 +249,7 @@ var LESSONS = [
     keywords: ["scratchpad", "stash", "special", "hide", "music", "notes"],
     category: "Windows",
     duration: 5,
-    difficulty: 3,
+    difficulty: 2,
     intro: "The scratchpad is a hidden workspace you can summon anywhere — great for music players and notes.",
     outro: "You now have a portable drawer for any window you need often but do not want in the layout.",
     steps: [
@@ -333,7 +335,7 @@ var LESSONS = [
     keywords: ["clipboard", "copy", "paste", "history"],
     category: "Tools",
     duration: 3,
-    difficulty: 2,
+    difficulty: 1,
     intro: "Everything you copy is kept in a searchable history.",
     outro: "Your clipboard is now a searchable history instead of one fragile temporary slot.",
     steps: [
@@ -440,7 +442,7 @@ var LESSONS = [
     keywords: ["window", "workspace", "silent", "send", "organize", "background"],
     category: "Windows",
     duration: 5,
-    difficulty: 3,
+    difficulty: 2,
     intro: "Move a window to another workspace while your view stays put, then go and collect it.",
     outro: "You can now file windows into other workspaces without interrupting the task in front of you.",
     steps: [
@@ -523,7 +525,7 @@ var LESSONS = [
     keywords: ["resize", "window", "bigger", "smaller", "space", "minus", "equal"],
     category: "Windows",
     duration: 6,
-    difficulty: 3,
+    difficulty: 2,
     intro: "Push a tile boundary in both directions and learn the modifier that makes a large adjustment.",
     outro: "You can now tune how much room each tile receives without leaving the keyboard.",
     steps: [
@@ -820,7 +822,7 @@ var LESSONS = [
     keywords: ["plugin", "plugins", "enable", "microphone", "shell", "bar"],
     category: "System",
     duration: 4,
-    difficulty: 3,
+    difficulty: 2,
     intro: "Add Omarchy’s Microphone control to the bar. The shell reload happens only after the final step.",
     outro: "The Microphone plugin is active. Reopen Sensei to use it and remove it in the next lesson.",
     steps: [
@@ -847,7 +849,7 @@ var LESSONS = [
     keywords: ["plugin", "plugins", "use", "disable", "toggle", "microphone", "mute", "bar"],
     category: "System",
     duration: 5,
-    difficulty: 3,
+    difficulty: 2,
     intro: "Try the Microphone bar control, restore its starting state, then remove the control from the bar.",
     outro: "You used a bar plugin and removed it without deleting its files.",
     steps: [
@@ -1078,7 +1080,7 @@ var LESSONS = [
     keywords: ["screenshot", "capture", "ocr", "text", "clipboard", "print screen"],
     category: "Capture",
     duration: 9,
-    difficulty: 3,
+    difficulty: 2,
     intro: "Capture a window with the keyboard region picker, then copy visible text from the screen.",
     outro: "You can now save visual evidence and turn unselectable screen text into editable clipboard text.",
     steps: [
@@ -1495,25 +1497,36 @@ var LESSONS = [
   }
 ]
 
+// The authored blocks stay grouped by topic. The course shown to learners is
+// grouped by difficulty, with authored order kept inside each level. This
+// makes the default path progress from Easy to Medium to Hard.
+var COURSE = LESSONS.map(function(lesson, index) {
+  return { lesson: lesson, index: index }
+}).sort(function(left, right) {
+  return left.lesson.difficulty - right.lesson.difficulty || left.index - right.index
+}).map(function(entry) {
+  return entry.lesson
+})
+
 function all() {
-  return LESSONS
+  return COURSE
 }
 
-// The list order is the learning path: the suggested next lesson is the
+// Course order is the learning path: the suggested next lesson is the
 // first unmastered one that is not the lesson just finished.
 function nextLesson(currentId, completedIds) {
-  for (var i = 0; i < LESSONS.length; i++) {
-    if (LESSONS[i].id === currentId) continue
-    if (completedIds.indexOf(LESSONS[i].id) !== -1) continue
-    return LESSONS[i]
+  for (var i = 0; i < COURSE.length; i++) {
+    if (COURSE[i].id === currentId) continue
+    if (completedIds.indexOf(COURSE[i].id) !== -1) continue
+    return COURSE[i]
   }
   return null
 }
 
 function search(query) {
-  if (!query) return LESSONS
+  if (!query) return COURSE
   var q = query.toLowerCase()
-  return LESSONS.filter(function(lesson) {
+  return COURSE.filter(function(lesson) {
     if (lesson.title.toLowerCase().indexOf(q) !== -1) return true
     if (lesson.intro.toLowerCase().indexOf(q) !== -1) return true
     if (lesson.category.toLowerCase().indexOf(q) !== -1) return true

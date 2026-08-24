@@ -1,0 +1,31 @@
+#!/usr/bin/env node
+
+const fs = require("fs")
+const path = require("path")
+
+const source = fs.readFileSync(path.resolve(__dirname, "..", "Sensei.qml"), "utf8")
+const errors = []
+
+function requirePattern(pattern, message) {
+  if (!pattern.test(source)) errors.push(message)
+}
+
+function rejectPattern(pattern, message) {
+  if (pattern.test(source)) errors.push(message)
+}
+
+requirePattern(/^import QtQuick\.Controls$/m, "use Omarchy's native Qt Quick controls")
+requirePattern(/ScrollBar\.vertical:\s*ScrollBar\s*\{/, "attach an interactive native scrollbar to the lesson list")
+requirePattern(/interactive:\s*true/, "keep the native scrollbar draggable")
+requirePattern(/flickableDirection:\s*Flickable\.VerticalFlick/, "limit the lesson list to vertical flicking")
+requirePattern(/interactive:\s*contentHeight\s*>\s*height/, "disable list dragging when all lessons fit")
+rejectPattern(/flickDeceleration:/, "do not override the stock Omarchy flick behavior")
+rejectPattern(/Component\.onCompleted:\s*lessonEnter\.restart\(\)/, "do not replay row-entry animation while scrolling")
+rejectPattern(/id:\s*scrollTrack/, "do not replace the native scrollbar with a non-interactive track")
+
+if (errors.length) {
+  errors.forEach(error => console.error(`Sensei.qml: ${error}`))
+  process.exit(1)
+}
+
+console.log("Validated native lesson-list scrolling")

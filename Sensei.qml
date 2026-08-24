@@ -3,6 +3,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import QtQuick
+import QtQuick.Controls
 import qs.Commons
 import qs.Ui
 import "lessons/lessons.js" as Lessons
@@ -34,6 +35,9 @@ Item {
   property var praiseCaps: []
   property bool skipUsed: false
   property var completedIds: []
+  readonly property int lessonCount: Lessons.all().length
+  readonly property var currentBelt: Dojo.beltFor(root.completedIds.length, root.lessonCount)
+  readonly property var nextBelt: Dojo.nextBeltFor(root.completedIds.length, root.lessonCount)
   // Window-local {x,y,w,h} of the region the current step highlights, or null.
   property var spotlightRect: null
   property string spotlightNs: ""
@@ -165,6 +169,18 @@ Item {
 
   function difficultyName(value) {
     return (["All levels", "Easy", "Medium", "Hard"])[value] || "All levels"
+  }
+
+  function beltSummary(includeNext) {
+    var text = root.currentBelt.name + " · " + root.currentBelt.title + " · "
+      + root.completedIds.length + " of " + root.lessonCount + " mastered"
+    if (includeNext && root.nextBelt) {
+      var remaining = Dojo.lessonsUntilNextBelt(root.completedIds.length, root.lessonCount)
+      text += " · " + remaining + " to " + root.nextBelt.name
+    } else if (includeNext) {
+      text += " · Course mastered"
+    }
+    return text
   }
 
   function select(delta) {
@@ -525,7 +541,7 @@ Item {
       height: Style.space(12)
       radius: Style.space(6)
       anchors.verticalCenter: parent.verticalCenter
-      color: Dojo.beltFor(root.completedIds.length).color
+      color: root.currentBelt.color
       border.color: root.border
       border.width: 1
     }
@@ -617,7 +633,7 @@ Item {
   }
 
   // ---------------------------------------------------------------------
-  // Centered course browser — "the dojo". The user can move it for the
+  // Centered course browser — the Omarchy Dojo. The user can move it for the
   // current visit; every new visit and monitor-size change recenters it.
   // ---------------------------------------------------------------------
   PanelWindow {
@@ -719,7 +735,7 @@ Item {
           PenguinSensei {
             id: browserPenguin
             size: parent.height
-            beltColor: Dojo.beltFor(root.completedIds.length).color
+            beltColor: root.currentBelt.color
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
           }
@@ -731,7 +747,7 @@ Item {
             spacing: Style.space(2)
 
             Text {
-              text: "SENSEI DOJO"
+              text: "OMARCHY DOJO"
               color: root.foreground
               font.family: root.fontFamily
               font.pixelSize: Style.font.title
@@ -1022,12 +1038,29 @@ Item {
           ListView {
             id: lessonList
             anchors.fill: parent
-            anchors.rightMargin: Style.space(14)
             model: displayModel
             clip: true
             spacing: Style.space(7)
             boundsBehavior: Flickable.StopAtBounds
-            flickDeceleration: 2400
+            flickableDirection: Flickable.VerticalFlick
+            interactive: contentHeight > height
+            pixelAligned: true
+
+            ScrollBar.vertical: ScrollBar {
+              policy: ScrollBar.AsNeeded
+              interactive: true
+              width: Style.space(7)
+              contentItem: Rectangle {
+                implicitWidth: Style.space(5)
+                radius: width / 2
+                color: root.selectedBackground
+              }
+              background: Rectangle {
+                implicitWidth: Style.space(5)
+                radius: width / 2
+                color: Qt.alpha(root.border, 0.4)
+              }
+            }
 
             Text {
               anchors.centerIn: parent
@@ -1054,7 +1087,6 @@ Item {
                 : lessonArea.containsMouse ? Qt.alpha(root.selectedBackground, 0.14) : Qt.alpha(root.border, 0.08)
               border.color: selected ? root.selectedBackground : Qt.alpha(root.border, 0.45)
               border.width: 1
-              opacity: 0
 
               Rectangle {
                 width: Style.space(3)
@@ -1063,7 +1095,7 @@ Item {
                 anchors.leftMargin: (lessonRow.accentGutter - width) / 2
                 anchors.verticalCenter: parent.verticalCenter
                 radius: width / 2
-                color: lessonRow.selected ? root.selectedText : Dojo.beltFor(root.completedIds.length).color
+                color: lessonRow.selected ? root.selectedText : root.currentBelt.color
                 opacity: lessonRow.selected ? 0.9 : 0.55
               }
 
@@ -1155,40 +1187,6 @@ Item {
               }
 
               Behavior on color { ColorAnimation { duration: 140 } }
-              SequentialAnimation {
-                id: lessonEnter
-                PauseAnimation { duration: Math.min(model.index, 6) * 35 }
-                ParallelAnimation {
-                  NumberAnimation { target: lessonRow; property: "opacity"; from: 0; to: 1; duration: 180; easing.type: Easing.OutCubic }
-                  NumberAnimation { target: lessonRow; property: "scale"; from: 0.975; to: 1; duration: 220; easing.type: Easing.OutCubic }
-                }
-              }
-              Component.onCompleted: lessonEnter.restart()
-            }
-          }
-
-          // Permanent scroll affordance. The thumb is always visible when
-          // content overflows, so the list never looks like a clipped panel.
-          Rectangle {
-            id: scrollTrack
-            width: Style.space(5)
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            radius: width / 2
-            visible: lessonList.contentHeight > lessonList.height
-            color: Qt.alpha(root.border, 0.4)
-
-            Rectangle {
-              width: parent.width
-              height: Math.max(Style.space(28), parent.height * lessonList.height / lessonList.contentHeight)
-              y: {
-                var travel = parent.height - height
-                var range = lessonList.contentHeight - lessonList.height
-                return range > 0 ? travel * Math.max(0, Math.min(range, lessonList.contentY)) / range : 0
-              }
-              radius: width / 2
-              color: root.selectedBackground
             }
           }
         }
@@ -1207,7 +1205,7 @@ Item {
                 ? parent.width * root.completedIds.length / Lessons.all().length : 0
               height: parent.height
               radius: parent.radius
-              color: Dojo.beltFor(root.completedIds.length).color
+              color: root.currentBelt.color
               border.color: Qt.alpha(root.border, 0.5)
               border.width: width > 0 ? 1 : 0
               Behavior on width { NumberAnimation { duration: 360; easing.type: Easing.OutCubic } }
@@ -1216,9 +1214,7 @@ Item {
           BeltBadge {
             width: parent.width
             height: Math.max(Style.space(20), root.smallFont + Style.spacing.controlPaddingY)
-            label: Dojo.beltFor(root.completedIds.length).name + " · "
-              + root.completedIds.length + " of " + Lessons.all().length + " mastered · "
-              + Dojo.rankFor(progress.points).name + " · " + progress.points + " pts"
+            label: root.beltSummary(true)
           }
         }
       }
@@ -1366,7 +1362,7 @@ Item {
           PenguinSensei {
             id: coachPenguin
             size: Style.space(44)
-            beltColor: Dojo.beltFor(root.completedIds.length).color
+            beltColor: root.currentBelt.color
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             celebrating: root.phase === "complete"
@@ -1640,9 +1636,7 @@ Item {
           }
 
           BeltBadge {
-            label: "Rank: " + Dojo.beltFor(root.completedIds.length).name
-              + " · " + Dojo.rankFor(progress.points).name
-              + " · " + progress.points + " pts"
+            label: root.beltSummary(false)
           }
 
           Text {
@@ -1710,7 +1704,7 @@ Item {
 
           CoachButton {
             visible: root.phase === "complete"
-            label: "Return to dojo"
+            label: "Return to Omarchy Dojo"
             onClicked: root.openBrowser()
           }
 

@@ -1,10 +1,10 @@
-# Sensei
+# Omarchy Dojo
 
 Interactive, do-it-yourself tutorials for [Omarchy](https://omarchy.org).
 
-Ask *"how do I…?"*, pick a lesson, and Sensei walks you through it on your real
-desktop: it tells you exactly which keys to press, then waits until you
-actually do it before moving on — like a game tutorial for your window manager.
+Ask *"how do I…?"*, pick a lesson, and the Omarchy Dojo walks you through it
+on your real desktop. The penguin sensei tells you which keys to press, then
+waits until you perform the action before moving on.
 
 ## Why it is different
 
@@ -46,7 +46,7 @@ or in `~/.config/hypr/bindings.lua` (pick any free chord — `SUPER + ALT + L`
 is unbound on a default setup):
 
 ```lua
-o.bind("SUPER + ALT + L", "Sensei", "omarchy-shell shell toggle io.github.yehudagurovich.sensei '{}'")
+o.bind("SUPER + ALT + L", "Omarchy Dojo", "omarchy-shell shell toggle io.github.yehudagurovich.sensei '{}'")
 ```
 
 A payload can launch a specific lesson directly — handy for binding the
@@ -65,9 +65,9 @@ omarchy-shell sensei dismiss
 
 ## Requirements
 
-Everything Sensei uses ships with Omarchy Quattro: `hyprctl`, `bash`,
+Everything the Omarchy Dojo uses ships with Omarchy Quattro: `hyprctl`, `bash`,
 `gawk`, `lua`, and `xkbcli` (libxkbcommon). No extra installs, no
-configuration changes — Sensei only reads your config and writes its own
+configuration changes — the plugin only reads your config and writes its own
 progress file under `~/.local/state/omarchy-sensei/`.
 
 Remove with:
@@ -82,8 +82,8 @@ omarchy plugin remove io.github.yehudagurovich.sensei
    centered on the active screen.
    First-time users get a one-click start into the welcome tour.
 2. Search by goal and filter by difficulty or mastery. Each card shows its
-   topic, time, steps, and summary. The permanent scroll track shows when
-   more lessons are below.
+   topic, time, steps, and summary. The native scrollbar supports wheel,
+   touchpad, and direct thumb dragging.
 3. Pick a lesson and follow the steps on your live desktop. Drag the dojo
    header or the coach header to move either panel. During a walkthrough the
    desktop keeps keyboard focus — use the coach card's buttons to skip a
@@ -112,11 +112,13 @@ Lessons are plain data in `lessons/lessons.js`. Each step declares:
   steps without one get a generic stuck-hint
 - `why` — the workflow reason shown with each action
 - `nextLabel` — an optional, specific confirmation label for a manual step
-- lessons also carry `category`, `duration`, `outro`, and `difficulty`
-  (1–3); first mastery awards 10 × difficulty points toward the rank ladder
+- lessons also carry `category`, `duration`, `outro`, and `difficulty`.
+  The shared scale is Easy for one safe feature, Medium for related actions
+  or setup, and Hard for multi-part or system-changing workflows
 
 The pack has 33 lessons and 136 steps, from short verified actions to
-multi-step system workflows and two guided circuits.
+multi-step system workflows and two guided circuits. The default path contains
+9 Easy lessons, then 16 Medium lessons, then 8 Hard lessons.
 Contributions of new lessons are welcome.
 
 ### Course coverage
@@ -141,24 +143,23 @@ Contributions of new lessons are welcome.
 - **Integrated practice:** a focus sprint and a toolbelt circuit combine the
   verified actions into longer keyboard-first workflows.
 
-## The dojo
+## The Omarchy Dojo
 
 Sensei is a penguin master with a white beard and an earned-color headband
 and sash. The bar symbol, dojo mascot, and coach mascot change color with
 your current belt. Completing lessons — without skipping steps — raises your
-belt rank, from white belt toward black belt, and earns points (10 × lesson
-difficulty) that climb a second ladder: Grasshopper to Sensei. Progress
-persists across restarts
-(`~/.local/state/omarchy-sensei/progress.json`). First-time visitors are
-pointed at the welcome tour, which walks the core moves in four steps; every
-completion screen suggests the next lesson on the path. Your training
-happens in a compact coach card in the corner of the screen — the desktop
-keeps keyboard focus, so you perform every step for real. A step that
-waits too long offers a hint instead of leaving you stuck.
+belt from White toward Black. There are nine belts. Each also has an Omarchy
+title: Fresh Install, Workspace Scout, Window Tiler, Menu Navigator, Desktop
+Shaper, System Keeper, Workflow Adept, Omarchy Operator, and Omarchy Sensei.
+The stages are spread across the full course; Black belt requires all 33
+lessons. Progress persists across restarts
+(`~/.local/state/omarchy-sensei/progress.json`). Every completion screen
+suggests the next unmastered lesson on the Easy-to-Hard path. Training happens
+in a compact coach card while the desktop keeps keyboard focus.
 
 ## Status
 
-Version 1.4.0 — the walkthrough engine works end to end: live key
+Version 1.5.0 — the walkthrough engine works end to end: live key
 resolution (including Lua `code:` binds via the compiled keymap),
 event-driven step completion (multi-monitor aware), spotlight highlighting,
 persistent progress and belts, and the coach card. Thirty-three lessons and 136
@@ -169,6 +170,14 @@ such as Pacman installation and suspend. See `PLAN.md`.
 
 Recent additions:
 
+- **Omarchy Dojo progression.** The browser, bar tooltip, and completion card
+  now use the Omarchy Dojo name. Nine Omarchy-titled belts span all 33 lessons,
+  and Black belt requires full course mastery.
+- **A consistent Easy-to-Hard path.** One rubric calibrates every lesson. The
+  default order contains all Easy lessons first, then Medium, then Hard.
+- **Native scrolling.** The lesson list uses Omarchy's normal interactive
+  scrollbar and flick behavior. Rows no longer replay entrance animations as
+  they are created during scrolling.
 - **Twenty-one advanced workflows.** The course now teaches Super + Space menu
   navigation, Super + Ctrl + K, silent window moves, focus and swap, resizing,
   screen-space controls, layouts, themes, Stay Awake, suspend/resume, plugins,
@@ -177,8 +186,8 @@ Recent additions:
 - **Reliable centering.** The dojo recenters each time it opens and when its
   monitor size changes. It remains draggable during the current visit.
 - **A course browser that shows its controls.** The larger dojo has explicit
-  difficulty and mastery filters, rich lesson cards, and a permanent scroll
-  track. Both the dojo and coach can be dragged.
+  difficulty and mastery filters, rich lesson cards, and a native scrollbar.
+  Both the dojo and coach can be dragged.
 - **Richer teaching.** Lesson cards show category, time, step count, and a
   summary. Every live step explains why the action is useful, and every
   lesson ends with a skill-specific result. Two guided circuits combine six
@@ -197,10 +206,8 @@ Recent additions:
 - **Precheck nudges.** Workspace-jump steps detect when you are already on
   the target workspace (where the taught key emits no event) and coach you
   to hop elsewhere first — the nudge appears and clears live as you move.
-- **Points, ranks, and a learning path.** First mastery of a lesson awards
-  10 × its difficulty in points; points climb the Grasshopper→Sensei rank
-  ladder shown beside your belt. The completion screen suggests — and can
-  start — the next unmastered lesson.
+- **Belts and a learning path.** Mastered lessons advance a nine-belt path.
+  The completion screen suggests — and can start — the next unmastered lesson.
 - **Hint escalation.** A step that waits ~30 seconds shows extra help: the
   step's own hint if it has one, otherwise an honest way out.
 - **A penguin in your bar.** Sensei ships a bar widget: one click opens the
@@ -208,10 +215,11 @@ Recent additions:
 
 ## Development
 
-Validate the lesson schema and its counts with:
+Validate the lesson schema, course progression, belts, and scrolling setup:
 
 ```sh
 ./bin/sensei-validate-lessons
+./bin/sensei-validate-ui
 ```
 
 ## License

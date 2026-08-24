@@ -6,15 +6,21 @@ const vm = require("vm")
 
 const root = path.resolve(__dirname, "..")
 const sourcePath = path.join(root, "lessons", "lessons.js")
+const dojoPath = path.join(root, "Dojo.js")
 const context = vm.createContext({})
 const expectedLessonCount = 33
 const expectedStepCount = 136
+const expectedDifficultyCounts = { 1: 9, 2: 16, 3: 8 }
 
 vm.runInContext(fs.readFileSync(sourcePath, "utf8"), context, {
   filename: sourcePath
 })
+vm.runInContext(fs.readFileSync(dojoPath, "utf8"), context, {
+  filename: dojoPath
+})
 
 const lessons = context.LESSONS
+const course = context.all()
 const errors = []
 const ids = new Set()
 const requiredLessonFields = [
@@ -111,9 +117,44 @@ if (Array.isArray(lessons) && lessons.length !== expectedLessonCount)
 if (stepCount !== expectedStepCount)
   fail("LESSONS", `expected ${expectedStepCount} steps, found ${stepCount}`)
 
+if (!Array.isArray(course) || course.length !== expectedLessonCount) {
+  fail("COURSE", `expected ${expectedLessonCount} lessons in the learning path`)
+} else {
+  const courseIds = new Set(course.map(lesson => lesson.id))
+  if (courseIds.size !== lessons.length || lessons.some(lesson => !courseIds.has(lesson.id)))
+    fail("COURSE", "must contain every lesson exactly once")
+  for (let index = 1; index < course.length; index++) {
+    if (course[index].difficulty < course[index - 1].difficulty)
+      fail("COURSE", `${course[index].id} is easier than the lesson before it`)
+  }
+}
+
+const difficultyCounts = { 1: 0, 2: 0, 3: 0 }
+if (Array.isArray(lessons)) lessons.forEach(lesson => difficultyCounts[lesson.difficulty]++)
+Object.keys(expectedDifficultyCounts).forEach(level => {
+  if (difficultyCounts[level] !== expectedDifficultyCounts[level])
+    fail("LESSONS", `expected ${expectedDifficultyCounts[level]} difficulty-${level} lessons, found ${difficultyCounts[level]}`)
+})
+
+const expectedBeltThresholds = [0, 4, 8, 12, 16, 20, 24, 28, 33]
+if (!Array.isArray(context.BELTS) || context.BELTS.length !== 9) {
+  fail("BELTS", "expected nine belt levels")
+} else {
+  expectedBeltThresholds.forEach((threshold, index) => {
+    if (context.beltThreshold(index, expectedLessonCount) !== threshold)
+      fail("BELTS", `expected ${context.BELTS[index].name} at ${threshold} mastered lessons`)
+    if (typeof context.BELTS[index].title !== "string" || !context.BELTS[index].title)
+      fail("BELTS", `belt ${index} needs an Omarchy title`)
+  })
+}
+if (context.beltFor(expectedLessonCount - 1, expectedLessonCount).name === "Black belt")
+  fail("BELTS", "Black belt must require full course mastery")
+if (context.beltFor(expectedLessonCount, expectedLessonCount).name !== "Black belt")
+  fail("BELTS", "full course mastery must award Black belt")
+
 if (errors.length) {
   errors.forEach(error => console.error(error))
   process.exit(1)
 }
 
-console.log(`Validated ${lessons.length} lessons and ${stepCount} steps`)
+console.log(`Validated ${lessons.length} lessons, ${stepCount} steps, and ${context.BELTS.length} belts`)
