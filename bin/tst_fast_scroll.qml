@@ -60,23 +60,11 @@ TestCase {
     compare(list.contentY, 0)
   }
 
-  function test_continuous_touchpad_reaches_expected_position() {
+  function test_continuous_touchpad_tracks_each_update() {
     for (var index = 0; index < 12; index++) {
       fastScroll.applyInput(-8, 0)
-      wait(10)
+      compare(list.contentY, (index + 1) * 16)
     }
-
-    verify(list.contentY >= 182)
-    tryCompare(list, "contentY", 192, 80)
   }
 
-  function test_touchpad_pixels_use_short_motion() {
-    fastScroll.applyInput(-8, 0)
-    verify(list.contentY < 16)
-    tryVerify(function() { return list.contentY > 0 }, 100)
-
-    fastScroll.applyInput(-8, 0)
-    verify(list.contentY < 32)
-    tryCompare(list, "contentY", 32, 200)
-  }
 }

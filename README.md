@@ -181,8 +181,8 @@ Recent additions:
   then Hard.
 - **Native scrolling.** The lesson list uses Omarchy's normal interactive
   scrollbar with a tested 2× touchpad gain and a three-card mouse-wheel step.
-  Mouse-wheel steps use a short, smooth motion. Touchpad scrolling uses a
-  16 ms motion so it stays responsive during a continuous gesture.
+  Mouse-wheel steps use a short, smooth motion. Touchpad scrolling applies
+  each update immediately, without animation.
   Hover effects pause while you scroll. Nearby rows are
   prepared and reused. A fresh open starts at the top, and filters reset the
   view to their first result.

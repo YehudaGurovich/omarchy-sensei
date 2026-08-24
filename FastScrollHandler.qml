@@ -7,7 +7,6 @@ WheelHandler {
   required property Flickable flickable
   property real rowHeight: 1
   property real scrollDestination: 0
-  readonly property int touchpadDuration: 16
   readonly property int wheelDuration: 120
   property Timer inputIdle: Timer { interval: 160 }
   property NumberAnimation scrollMotion: NumberAnimation {
@@ -35,12 +34,18 @@ WheelHandler {
     var maximum = minimum + Math.max(
       0, root.flickable.contentHeight - root.flickable.height)
 
+    if (isTouchpad) {
+      root.scrollMotion.stop()
+      root.scrollDestination = Scroll.clampContentY(
+        root.flickable.contentY - delta, minimum, maximum)
+      root.flickable.contentY = root.scrollDestination
+      return
+    }
+
     if (!root.scrollMotion.running)
       root.scrollDestination = root.flickable.contentY
     root.scrollDestination = Scroll.clampContentY(
       root.scrollDestination - delta, minimum, maximum)
-    root.scrollMotion.duration = isTouchpad
-      ? root.touchpadDuration : root.wheelDuration
     root.scrollMotion.from = root.flickable.contentY
     root.scrollMotion.to = root.scrollDestination
     root.scrollMotion.restart()
