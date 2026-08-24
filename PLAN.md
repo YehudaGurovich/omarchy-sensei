@@ -66,27 +66,201 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
   theme menu shares the omarchy-menu namespace), lock/idle (locks the
   session mid-lesson), resize submap and window groups (no reliably tight
   events confirmed yet).
-- **Day 4 (Sun Aug 24 morning is the deadline — finish Sat night):** polish,
-  preview.png, README pass, validate, fresh-install test, submit form.
+- **Day 4 round 1 — DONE (Aug 21): audit + dynamism.** Full fact-check and
+  an energy pass, verified end to end on this machine (welcome tour driven
+  through real compositor events via scripted dispatches).
+  Audit results:
+  - All 12 lesson bind descriptions resolve against the live config (both
+    `bin/sensei-binds` and `hyprctl binds -j`). Layer namespaces
+    omarchy-bar/menu/emojis/clipboard confirmed in the shell source.
+    lua/gawk/xkbcli/hyprctl all present. Terminal class regex covers the
+    terminals installed here. `omarchy plugin validate .` passes (exit 0).
+  - Found: README said 1.0.0 while manifest said 1.0.1 — versions now
+    aligned at 1.1.0.
+  - Found: workspace-jump steps dead-ended when the user was already on
+    the target workspace (switching to the current workspace emits no
+    event — reproduced live). Fix: `notOnWorkspace` step field + a live
+    nudge, updated from `workspace` AND `focusedmon` events (the first
+    test caught the nudge going stale on a monitor-focus change).
+  - Known, accepted: float/fullscreen lessons self-correct if the window
+    already is in the target state (first press emits the opposite event,
+    second press completes); window spotlight degrades silently when the
+    focused window is on a different monitor than the coach card.
+  New in 1.1.0: spotlight anchors for the focused window and the open
+  menu/emojis/clipboard layers; pressed-key echo beside the praise line
+  the moment the event fires; animated spotlight (fade + breathing ring);
+  coach card slide-in; staggered keycap pop-in; pulsing current-step dot;
+  blinking/nodding penguin with a celebration hop; belt-colored confetti
+  on completion; browser card entrance and hover transitions.
+- **Day 4 round 2 — DONE (Aug 21): backlog features.** Points and ranks,
+  learning path, hint escalation, bigger praise pool.
+  - Every lesson has a `difficulty` (1–3, sums to 150 across the pack);
+    first mastery awards 10 × difficulty points, stored in the points
+    field progress.json carried since day one. Points climb a rank ladder
+    (Grasshopper → Sensei, thresholds in Dojo.js tuned so mastering all
+    lessons reaches Sensei). Rank + points show on the completion screen
+    and in the browser belt row.
+  - The completion screen names the next unmastered lesson in list order
+    (the list IS the learning path) with a button that starts it.
+  - Hint escalation: a step waiting 30 s shows its `hint` field, or a
+    generic way out. Four steps got real hints (terminal alternative,
+    float toggle, fullscreen toggle, scratchpad vanish reassurance).
+  - Verified live: open-terminal completed by real event → 10 points in
+    progress.json, next=welcome-tour suggested, rank shown. Hint timer
+    verified by review only — two 30-second live waits were both cut
+    short (see gotchas below); the path shares its mechanics with the
+    proven praise timer.
+  - Investigated and dropped for now: a resize lesson. Quattro has no
+    resize submap — resizing is direct binds ("Expand window left",
+    keycodes 20/21) — and no socket2 event for resize was confirmed
+    (the probe hit a fullscreen window; retry on an idle machine).
+- **Day 4 round 3 — DONE (Aug 23): modern-look pass + full sweep.**
+  - Visual polish, all inside the theme tokens: keycaps joined with "+"
+    separators and given a subtle border; the step dots replaced by a
+    full-width segmented progress bar (done segments filled, current one
+    breathing); difficulty shown as three dots on every browser row;
+    thin rules under both card headers; the completion screen's "Next
+    lesson" is now a filled primary button.
+  - dev.sh now restarts the shell by default after syncing (`--hot` keeps
+    the old watcher-driven reload). Rationale: the hot-reload path is the
+    crash trigger below and leaves stale IPC handlers.
+  - Crash status confirmed (Aug 22): upstream issue
+    quickshell-mirror/quickshell#956 is open with the same stack and a
+    root cause (EngineGeneration::destroy() clears extensions but not the
+    hash; forGeneration dynamic_casts a freed pointer) — no fix merged;
+    an 8-round local reload-churn repro attempt did not crash (upstream
+    quotes ~2 per 30 cycles), consistent with a timing-dependent race.
+  - Full end-to-end sweep: all 10 lessons, all 22 steps, driven through
+    real compositor actions (dispatches + shell overlay toggles) with
+    zero failures; finished at 150 points = Sensei rank, next=null.
+    No sensei QML warnings in the shell log. Test state fully restored.
+- **Day 4 round 4 — DONE (Aug 23): bar widget + palette refresh (1.2.0).**
+  - Sensei is now also a bar widget: the penguin (compact variant, knot
+    tails hidden at icon size) as a BarIconButton that toggles the dojo —
+    the beginner front door, zero setup. `kinds: ["overlay",
+    "bar-widget"]`, `defaultSection: "right"`. Verified rendering in the
+    live bar by screenshot.
+  - Placement quirk: widgets auto-place at plugin ENABLE time, so a fresh
+    marketplace install gets the icon automatically, but an existing
+    install needs one disable/enable cycle (or `omarchy bar put`) —
+    documented in the README. `omarchy bar put` alone claimed "is on the
+    bar" without adding it to shell.json's layout; the enable cycle is
+    the reliable path.
+  - Dojo browser is a real command palette now: search field with prompt
+    glyph and blinking cursor, first-visit banner with a primary "Begin"
+    button into the welcome tour, empty-search state with suggestions,
+    and a mastery progress bar above the belt line.
+  - Live user validation: the welcome tour and float lessons were
+    completed for real through the new UI mid-round (progress.json:
+    30 pts) — CTA, engine, and points all exercised by an actual run.
+- **Day 4 round 5 — DONE (Aug 23): course-browser redesign (1.3.0).**
+  - Replaced the narrow palette with a larger course browser. It has visible
+    difficulty and mastery filters; lesson summaries with category, duration,
+    and step count; and a permanent scroll track plus an explicit overflow
+    label. User review removed the sort row and widened the lesson accent
+    gutter so the line cannot touch the text.
+  - The dojo and coach cards can be dragged by their headers and stay inside
+    the monitor bounds. Menu rows, chips, entry motion, spotlight motion,
+    keycaps, praise, progress, and completion all use short transitions.
+  - Each live step now explains why the action is useful. Each lesson has a
+    skill-specific completion message, so the flow teaches a desktop habit
+    and not only a shortcut. Two six-step guided circuits combine the already
+    verified focus and overlay actions into longer practice workflows.
+  - The mascot headband and waist sash now use the earned belt color in the
+    bar, browser, and coach. The bar watches progress.json and updates after
+    mastery without a shell restart.
+  - Verification: `qmllint -I /usr/share/omarchy/shell` passes for all QML
+    files; `omarchy plugin validate .`, `node --check`, the lesson-data
+    invariant check, and `git diff --check` pass. The live shell showed the
+    centered 12-lesson browser and coach with no Sensei runtime warnings.
+- **Day 4 round 6 — DONE (Aug 23): advanced operating-system course (1.4.0).**
+  - Added 20 multi-step lessons. The 32-lesson, 135-step pack now covers
+    menu and app search, keybinding references, advanced window control,
+    screen-space toggles, appearance, power, plugins, Pacman packages, web
+    apps, dictation, capture, OCR, recording, sharing, hardware panels, and
+    reminders.
+  - Event-backed actions still wait for real compositor results. Operations
+    with no safe event — including resize, package choice, dictation, and
+    suspend/resume — use explicit manual checkpoints with action-specific
+    button labels.
+  - Reversible lessons restore the starting state for layout, shell space,
+    Stay Awake, plugins, focus modes, and window visuals. Destructive targets
+    such as a package or web app remain the learner’s choice.
+  - The dojo now recenters on every open and monitor-size change, while its
+    header remains draggable for the current visit.
+  - Added a `sensei dismiss` IPC action. A normal Super+W close helper can now
+    close the dojo or coach without using toggle, which could reopen a closed
+    overlay.
+- **Day 4 round 7 (Sun Aug 24 morning is the deadline — finish Sat night):**
+  preview.png refresh, fresh-install test, submit form.
 
 ## Dev loop
 
 ```sh
-./dev.sh          # sync repo -> ~/.config/omarchy/plugins/<id> and rescan
-omarchy restart shell   # when hot reload does not pick up changes
+./dev.sh          # sync repo -> ~/.config/omarchy/plugins/<id> and restart the shell
+./dev.sh --hot    # sync only; file watcher reloads (fast, crash-prone, stale IPC)
 omarchy-shell shell toggle io.github.yehudagurovich.sensei '{}'
 ```
 
-Logs: `qs log` workflow.
+Logs: `qs list --all` for the instance id, then `qs log -i <id>`.
+
+Gotchas learned while testing:
+
+- Hot reload re-creates the plugin but the OLD IpcHandler keeps answering
+  (`Handler was registered but will not be used` in the log). Any change to
+  IPC-visible behavior needs `omarchy restart shell` before `omarchy-shell
+  sensei …` reflects it.
+- Scripted lesson driving uses Quattro's Lua dispatch syntax:
+  `hyprctl dispatch 'hl.dsp.focus({ workspace = "2" })'`,
+  `'hl.dsp.window.move({ workspace = "1" })'`,
+  `'hl.dsp.exec_cmd("alacritty")'`. Classic `hyprctl dispatch workspace 2`
+  fails on this build.
+- The shell can SIGSEGV and auto-respawn during `omarchy restart shell`
+  (known upstream issue, see Day 2) — a lesson started right before the
+  crash silently ends; check `qs list --all` for a new instance id before
+  blaming the plugin. Confirmed twice by coredump: the crash is
+  `IpcHandler::onPostReload` → `__dynamic_cast`, and it can fire up to a
+  minute AFTER a dev.sh sync (queued plugin-reload events from the rsync
+  file churn). `dev.sh` does not request an additional explicit rescan; the
+  shell's debounced file watcher reloads after the sync. After syncing, wait
+  for the instance to settle before driving lessons.
+- ANY file write inside ANY local plugin's directory triggers the shell's
+  `reloadPlugins()` → `unloadPanels()` → `close()` on every panel plugin —
+  which ends an in-flight lesson. Plugins must never write state into
+  their own plugin dir (Sensei writes to `~/.local/state`, correct), and
+  scripted tests should not touch `~/.config/omarchy/plugins` mid-lesson.
 
 ## Ideas backlog
 
-- **Omarchy points / sensei ranks:** award points per completed lesson,
-  weighted by difficulty (each lesson gets a difficulty field). Points feed a
-  rank progression from grasshopper to sensei alongside the belt colors, so
-  advanced lessons (submaps, window groups, scripting) are worth more than
-  basics. Local-only. Design the Day 2 progress.json with a points field so
-  this can land without a schema change.
+- ~~**Omarchy points / sensei ranks**~~ — DONE (Day 4 round 2): 10 ×
+  difficulty per first mastery, Grasshopper → Sensei ladder in Dojo.js.
+- ~~**Hint escalation**~~ — DONE (Day 4 round 2): 30 s timer, per-step
+  `hint` field with a generic fallback.
+- ~~**Belt path / curriculum (lite)**~~ — DONE (Day 4 round 2): list order
+  is the path; completion screen suggests and can start the next
+  unmastered lesson. Full multi-course curricula remain open.
+- **Challenge mode:** timed replay of a mastered lesson ("do the four core
+  moves in 20 seconds"), with a personal-best per lesson stored next to
+  `points`. Verified by the same events, so it cannot be cheesed.
+- **Practice stats:** per-lesson completion count, fastest run, and a daily
+  streak — data already flows through progress.json.
+- **More event-verified lessons once tight signals are confirmed:** window
+  groups, moving workspaces between monitors (`moveworkspace`), resizing,
+  and theme changes. These lessons now exist with manual checkpoints where
+  the compositor does not expose a distinguishing result.
+- **User lesson packs:** load extra lesson files from
+  `~/.config/omarchy-sensei/lessons.d/` so people can ship dojo packs for
+  their own setups (the engine is already data-driven).
+- **First-run autostart:** offer a one-line snippet that opens the welcome
+  tour on a fresh Omarchy install's first login, gated on progress.json
+  being absent.
+- **Multi-monitor coach placement:** put the coach card (and window
+  spotlight) on the monitor the user is actually working on, following
+  `focusedmon` — removes the silent cross-monitor spotlight degrade.
+- **Sound cues (opt-in):** a soft "tok" on step completion and a gong on
+  lesson mastery, respecting a quiet flag in the payload.
+- **Sensei speaks:** praise pool grown to ten lines (Day 4 round 2).
+  Still open: occasional koans keyed to lesson ids so repeats feel fresh.
 
 ## Open questions
 

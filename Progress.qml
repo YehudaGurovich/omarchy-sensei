@@ -39,6 +39,8 @@ Item {
   FileView {
     path: root.path
     printErrors: false
+    watchChanges: true
+    onFileChanged: reload()
     onLoaded: {
       try {
         var data = JSON.parse(text())

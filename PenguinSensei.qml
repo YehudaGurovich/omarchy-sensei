@@ -2,13 +2,69 @@ import QtQuick
 
 // Original penguin sensei mascot, drawn entirely in QML shapes.
 // Fixed palette so the character reads the same on every theme.
+// The penguin blinks on its own; nod() bows once (step praise) and
+// celebrating loops a little hop (lesson complete).
 Item {
   id: root
   property int size: 64
+  property bool celebrating: false
+  // Earned belt color. It drives both the headband and the waist sash so
+  // the mascot remains readable at compact bar-widget sizes.
+  property color beltColor: "#f5f5f5"
+  // Compact drops the headband knot tails — at bar-icon sizes they read
+  // as a stray red streak rather than a knot.
+  property bool compact: false
   readonly property real s: size / 64
+
+  // 1 = eyes open; animated toward 0.15 for a blink.
+  property real eyeScale: 1
+
+  function nod() { nodAnim.restart() }
 
   width: size
   height: size
+
+  transform: [
+    Translate { id: hop; y: 0 },
+    Rotation {
+      id: tilt
+      origin.x: root.width / 2
+      origin.y: root.height * 0.75
+      angle: 0
+    }
+  ]
+
+  SequentialAnimation {
+    running: root.visible
+    loops: Animation.Infinite
+    PauseAnimation { duration: 2600 }
+    NumberAnimation { target: root; property: "eyeScale"; to: 0.15; duration: 70 }
+    NumberAnimation { target: root; property: "eyeScale"; to: 1; duration: 110 }
+    PauseAnimation { duration: 4300 }
+    NumberAnimation { target: root; property: "eyeScale"; to: 0.15; duration: 70 }
+    NumberAnimation { target: root; property: "eyeScale"; to: 1; duration: 110 }
+  }
+
+  SequentialAnimation {
+    id: nodAnim
+    NumberAnimation { target: tilt; property: "angle"; to: 9; duration: 130; easing.type: Easing.OutCubic }
+    NumberAnimation { target: tilt; property: "angle"; to: 0; duration: 180; easing.type: Easing.OutBack }
+  }
+
+  SequentialAnimation {
+    running: root.celebrating && root.visible
+    loops: Animation.Infinite
+    alwaysRunToEnd: true
+    ParallelAnimation {
+      NumberAnimation { target: hop; property: "y"; to: -3 * root.s; duration: 260; easing.type: Easing.OutQuad }
+      NumberAnimation { target: tilt; property: "angle"; to: -5; duration: 260 }
+    }
+    ParallelAnimation {
+      NumberAnimation { target: hop; property: "y"; to: 0; duration: 260; easing.type: Easing.InQuad }
+      NumberAnimation { target: tilt; property: "angle"; to: 5; duration: 260 }
+    }
+    NumberAnimation { target: tilt; property: "angle"; to: 0; duration: 180 }
+  }
 
   // flippers
   Rectangle {
@@ -44,28 +100,28 @@ Item {
     color: "#f4f0e6"
   }
 
-  // eyes
+  // eyes — height follows eyeScale around a fixed center, so blinks squash
   Rectangle {
-    x: 21 * root.s; y: 16 * root.s
-    width: 9 * root.s; height: 9 * root.s
+    x: 21 * root.s; y: (16 + 4.5 * (1 - root.eyeScale)) * root.s
+    width: 9 * root.s; height: 9 * root.s * root.eyeScale
     radius: 4.5 * root.s
     color: "#fafafa"
   }
   Rectangle {
-    x: 34 * root.s; y: 16 * root.s
-    width: 9 * root.s; height: 9 * root.s
+    x: 34 * root.s; y: (16 + 4.5 * (1 - root.eyeScale)) * root.s
+    width: 9 * root.s; height: 9 * root.s * root.eyeScale
     radius: 4.5 * root.s
     color: "#fafafa"
   }
   Rectangle {
-    x: 24.5 * root.s; y: 19 * root.s
-    width: 4 * root.s; height: 4 * root.s
+    x: 24.5 * root.s; y: (19 + 2 * (1 - root.eyeScale)) * root.s
+    width: 4 * root.s; height: 4 * root.s * root.eyeScale
     radius: 2 * root.s
     color: "#1d2024"
   }
   Rectangle {
-    x: 37.5 * root.s; y: 19 * root.s
-    width: 4 * root.s; height: 4 * root.s
+    x: 37.5 * root.s; y: (19 + 2 * (1 - root.eyeScale)) * root.s
+    width: 4 * root.s; height: 4 * root.s * root.eyeScale
     radius: 2 * root.s
     color: "#1d2024"
   }
@@ -92,20 +148,43 @@ Item {
     x: 12 * root.s; y: 11 * root.s
     width: 40 * root.s; height: 6 * root.s
     radius: 3 * root.s
-    color: "#c9403b"
+    color: root.beltColor
+    border.color: "#80ffffff"
+    border.width: Math.max(1, root.s)
   }
   Rectangle {
+    visible: !root.compact
     x: 49 * root.s; y: 10 * root.s
     width: 11 * root.s; height: 4 * root.s
     radius: 2 * root.s
     rotation: -28
-    color: "#c9403b"
+    color: root.beltColor
   }
   Rectangle {
+    visible: !root.compact
     x: 49 * root.s; y: 14 * root.s
     width: 9 * root.s; height: 4 * root.s
     radius: 2 * root.s
     rotation: 12
-    color: "#c9403b"
+    color: root.beltColor
+  }
+
+  // Belt sash. The outline keeps white and black belts visible against the
+  // fixed penguin palette, and makes progression clear in the bar symbol.
+  Rectangle {
+    x: 17 * root.s; y: 43 * root.s
+    width: 30 * root.s; height: 5 * root.s
+    radius: 1.5 * root.s
+    color: root.beltColor
+    border.color: "#66000000"
+    border.width: Math.max(1, root.s)
+  }
+  Rectangle {
+    x: 29.5 * root.s; y: 42 * root.s
+    width: 6 * root.s; height: 7 * root.s
+    radius: 1.5 * root.s
+    color: root.beltColor
+    border.color: "#66000000"
+    border.width: Math.max(1, root.s)
   }
 }

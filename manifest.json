@@ -2,13 +2,21 @@
   "schemaVersion": 1,
   "id": "io.github.yehudagurovich.sensei",
   "name": "Sensei",
-  "version": "1.0.1",
+  "version": "1.4.0",
   "author": "YehudaGurovich",
   "license": "MIT",
   "description": "Interactive, do-it-yourself tutorials for Omarchy. Ask how to do something, then learn by doing it — Sensei reads your real keybindings and waits until you actually perform each step.",
-  "kinds": ["overlay"],
+  "kinds": ["overlay", "bar-widget"],
   "keepLoaded": true,
   "entryPoints": {
-    "overlay": "Sensei.qml"
+    "overlay": "Sensei.qml",
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Sensei",
+    "description": "One-click dojo: learn Omarchy by doing.",
+    "category": "Learning",
+    "allowMultiple": false,
+    "defaultSection": "right"
   }
 }
