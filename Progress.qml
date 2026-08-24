@@ -3,7 +3,7 @@ import Quickshell.Io
 import QtQuick
 
 // Persistent lesson progress: $XDG_STATE_HOME/omarchy-sensei/progress.json
-// (falls back to ~/.local/state). The legacy points field remains in schema
+// (falls back to ~/.local/state). The old points field remains in schema
 // version 1 for compatibility; belt progress uses mastered lesson count.
 Item {
   id: root

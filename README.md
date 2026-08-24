@@ -11,7 +11,7 @@ waits until you perform the action before moving on.
 - **It reads your config, not the defaults.** Keybindings resolve live from
   your real Hyprland config: `bin/sensei-binds` runs your config entry point
   with a stubbed Hyprland API to record every binding, then resolves keycodes
-  through your compiled keymap, with `hyprctl binds -j` as fallback. Sensei
+  through your compiled keymap, with `hyprctl binds -j` as fallback. The dojo
   always shows *your* keys — even if you rebound everything.
 - **It verifies by results, not keypresses.** Steps complete when the real
   compositor event fires (workspace changed, window moved, terminal opened).
@@ -107,18 +107,19 @@ Lessons are plain data in `lessons/lessons.js`. Each step declares:
   (replaced bar, other monitor, no focused window) degrade silently
 - `notOnWorkspace` — marks a step that cannot complete while you are
   already on its target workspace (switching to the workspace you are on
-  emits no event); Sensei shows a live nudge to hop elsewhere first
+  emits no event); the dojo shows a live nudge to hop elsewhere first
 - `hint` — optional extra help shown when a step has waited a while;
   steps without one get a generic stuck-hint
 - `why` — the workflow reason shown with each action
 - `nextLabel` — an optional, specific confirmation label for a manual step
 - lessons also carry `category`, `duration`, `outro`, and `difficulty`.
-  The shared scale is Easy for one safe feature, Medium for related actions
-  or setup, and Hard for multi-part or system-changing workflows
+  The shared scale is Easy for basic actions with no required earlier lesson,
+  Medium for one feature family that builds on Easy skills, and Hard for a
+  workflow that combines feature families, needs setup, or has more risk
 
 The pack has 33 lessons and 136 steps, from short verified actions to
 multi-step system workflows and two guided circuits. The default path contains
-9 Easy lessons, then 16 Medium lessons, then 8 Hard lessons.
+9 Easy lessons, then 13 Medium lessons, then 11 Hard lessons.
 Contributions of new lessons are welcome.
 
 ### Course coverage
@@ -173,8 +174,9 @@ Recent additions:
 - **Omarchy Dojo progression.** The browser, bar tooltip, and completion card
   now use the Omarchy Dojo name. Nine Omarchy-titled belts span all 33 lessons,
   and Black belt requires full course mastery.
-- **A consistent Easy-to-Hard path.** One rubric calibrates every lesson. The
-  default order contains all Easy lessons first, then Medium, then Hard.
+- **A consistent Easy-to-Hard path.** One difficulty scale applies to every
+  lesson. The default order contains all Easy lessons first, then Medium,
+  then Hard.
 - **Native scrolling.** The lesson list uses Omarchy's normal interactive
   scrollbar and flick behavior. Rows no longer replay entrance animations as
   they are created during scrolling.
@@ -210,7 +212,7 @@ Recent additions:
   The completion screen suggests — and can start — the next unmastered lesson.
 - **Hint escalation.** A step that waits ~30 seconds shows extra help: the
   step's own hint if it has one, otherwise an honest way out.
-- **A penguin in your bar.** Sensei ships a bar widget: one click opens the
+- **A penguin in your bar.** Omarchy Dojo ships a bar widget: one click opens the
   dojo, and a first-time button starts the welcome tour.
 
 ## Development

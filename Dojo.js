@@ -55,7 +55,7 @@ function lessonsUntilNextBelt(completedCount, totalLessons) {
   return Math.max(0, beltThreshold(index + 1, totalLessons) - completedCount)
 }
 
-// Keep the legacy score current for progress-file compatibility. Belt
+// Keep the old score current for progress-file compatibility. Belt
 // progression uses mastered lesson count, not points.
 function pointsFor(lesson) {
   return 10 * (lesson && lesson.difficulty ? lesson.difficulty : 1)

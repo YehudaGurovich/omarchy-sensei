@@ -110,7 +110,7 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
     verified by review only — two 30-second live waits were both cut
     short (see gotchas below); the path shares its mechanics with the
     proven praise timer.
-  - Version 1.5.0 later retired the separate visible rank ladder. The points
+  - Version 1.5.0 later removed the visible rank ladder. The points
     field remains in progress schema version 1 for compatibility; the UI now
     shows one nine-belt course progression.
   - Investigated and dropped for now: a resize lesson. Quattro has no
@@ -200,7 +200,7 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
 - **Day 4 round 7 — DONE (Aug 24): Omarchy Dojo progression (1.5.0).**
   - Renamed the visible product and bar widget to Omarchy Dojo. The stable
     plugin id, IPC target, state path, and source filenames stay unchanged.
-  - Recalibrated all lessons with one rubric: 9 Easy, 16 Medium, and 8 Hard.
+  - Applied one difficulty scale to all lessons: 9 Easy, 13 Medium, and 11 Hard.
     Runtime course order is now Easy → Medium → Hard while authored topic
     groups stay readable in the lesson data file.
   - Spread nine Omarchy-titled belts across the complete course. White starts
@@ -256,7 +256,7 @@ Gotchas learned while testing:
 ## Ideas backlog
 
 - ~~**Omarchy points / sensei ranks**~~ — built in Day 4 round 2, then replaced
-  in 1.5.0 by one nine-belt Omarchy Dojo path. The legacy points value remains
+  in 1.5.0 by one nine-belt Omarchy Dojo path. The old points value remains
   in progress schema version 1.
 - ~~**Hint escalation**~~ — DONE (Day 4 round 2): 30 s timer, per-step
   `hint` field with a generic fallback.

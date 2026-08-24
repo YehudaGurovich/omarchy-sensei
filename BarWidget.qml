@@ -10,7 +10,7 @@ BarWidget {
   id: root
   moduleName: "io.github.yehudagurovich.sensei"
 
-  readonly property var belt: Dojo.beltFor(progress.completed.length, Lessons.all().length)
+  readonly property var belt: Dojo.beltFor(progress.completed.length, Lessons.learningPath().length)
 
   Progress { id: progress }
 

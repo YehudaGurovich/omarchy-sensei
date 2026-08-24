@@ -10,7 +10,32 @@ const dojoPath = path.join(root, "Dojo.js")
 const context = vm.createContext({})
 const expectedLessonCount = 33
 const expectedStepCount = 136
-const expectedDifficultyCounts = { 1: 9, 2: 16, 3: 8 }
+const expectedDifficultyGroups = {
+  1: [
+    "welcome-tour", "switch-workspaces", "move-window", "open-terminal",
+    "float-window", "fullscreen", "omarchy-menu", "emojis", "clipboard"
+  ],
+  2: [
+    "scratchpad", "menu-navigation", "keybinding-finder",
+    "silent-window-move", "focus-and-swap", "resize-window",
+    "workspace-layout", "theme-and-background", "stay-awake", "focus-modes",
+    "quick-settings-panels", "set-reminder", "window-visual-toggles"
+  ],
+  3: [
+    "make-screen-space", "lock-suspend-resume", "enable-microphone-plugin",
+    "use-disable-microphone-plugin", "install-pacman-package",
+    "create-web-app", "dictation", "screenshot-and-ocr",
+    "screenrecord-and-share", "focus-sprint", "toolbelt-circuit"
+  ]
+}
+const expectedDifficultyCounts = Object.fromEntries(
+  Object.entries(expectedDifficultyGroups).map(([level, ids]) => [level, ids.length])
+)
+const expectedDifficultyById = Object.fromEntries(
+  Object.entries(expectedDifficultyGroups).flatMap(([level, ids]) =>
+    ids.map(id => [id, Number(level)])
+  )
+)
 
 vm.runInContext(fs.readFileSync(sourcePath, "utf8"), context, {
   filename: sourcePath
@@ -20,7 +45,7 @@ vm.runInContext(fs.readFileSync(dojoPath, "utf8"), context, {
 })
 
 const lessons = context.LESSONS
-const course = context.all()
+const course = context.learningPath()
 const errors = []
 const ids = new Set()
 const requiredLessonFields = [
@@ -80,6 +105,8 @@ if (!Array.isArray(lessons)) {
       fail(lessonLocation, "duration must be a positive integer")
     if (![1, 2, 3].includes(lesson.difficulty))
       fail(lessonLocation, "difficulty must be 1, 2, or 3")
+    else if (expectedDifficultyById[lesson.id] !== lesson.difficulty)
+      fail(lessonLocation, `expected difficulty ${expectedDifficultyById[lesson.id]} for ${lesson.id}`)
     if (!Array.isArray(lesson.steps) || lesson.steps.length === 0) {
       fail(lessonLocation, "steps must be a non-empty array")
       return

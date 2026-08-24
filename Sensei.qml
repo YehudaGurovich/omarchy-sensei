@@ -35,7 +35,7 @@ Item {
   property var praiseCaps: []
   property bool skipUsed: false
   property var completedIds: []
-  readonly property int lessonCount: Lessons.all().length
+  readonly property int lessonCount: Lessons.learningPath().length
   readonly property var currentBelt: Dojo.beltFor(root.completedIds.length, root.lessonCount)
   readonly property var nextBelt: Dojo.nextBeltFor(root.completedIds.length, root.lessonCount)
   // Window-local {x,y,w,h} of the region the current step highlights, or null.
@@ -56,7 +56,7 @@ Item {
       + " — hop to any other workspace first, then come back with the keys below."
   }
 
-  // Shares the [menu] surface tokens so every Omarchy theme styles Sensei.
+  // Shares the [menu] surface tokens so every Omarchy theme styles the dojo.
   property color background: Color.menu.background
   property color foreground: Color.menu.text
   property color border: Color.menu.border
@@ -75,7 +75,7 @@ Item {
   property int smallFont: Math.max(10, Math.round(Style.font.body * 0.85))
 
   function findLesson(id) {
-    var match = Lessons.all().filter(function(l) { return l.id === id })
+    var match = Lessons.learningPath().filter(function(l) { return l.id === id })
     return match.length ? match[0] : null
   }
 
@@ -1044,8 +1044,6 @@ Item {
             boundsBehavior: Flickable.StopAtBounds
             flickableDirection: Flickable.VerticalFlick
             interactive: contentHeight > height
-            pixelAligned: true
-
             ScrollBar.vertical: ScrollBar {
               policy: ScrollBar.AsNeeded
               interactive: true
@@ -1182,7 +1180,9 @@ Item {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onEntered: root.selectedIndex = model.index
+                onEntered: {
+                  if (!lessonList.moving) root.selectedIndex = model.index
+                }
                 onClicked: root.activateIndex(model.index)
               }
 
@@ -1201,8 +1201,8 @@ Item {
             radius: height / 2
             color: Qt.alpha(root.border, 0.45)
             Rectangle {
-              width: Lessons.all().length
-                ? parent.width * root.completedIds.length / Lessons.all().length : 0
+              width: root.lessonCount
+                ? parent.width * root.completedIds.length / root.lessonCount : 0
               height: parent.height
               radius: parent.radius
               color: root.currentBelt.color

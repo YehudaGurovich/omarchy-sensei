@@ -14,14 +14,23 @@ function rejectPattern(pattern, message) {
   if (pattern.test(source)) errors.push(message)
 }
 
+const scrollBarStart = source.indexOf("ScrollBar.vertical: ScrollBar {")
+const scrollBarEnd = source.indexOf("\n            Text {", scrollBarStart)
+const scrollBarSource = scrollBarStart >= 0 && scrollBarEnd > scrollBarStart
+  ? source.slice(scrollBarStart, scrollBarEnd)
+  : ""
+
 requirePattern(/^import QtQuick\.Controls$/m, "use Omarchy's native Qt Quick controls")
 requirePattern(/ScrollBar\.vertical:\s*ScrollBar\s*\{/, "attach an interactive native scrollbar to the lesson list")
-requirePattern(/interactive:\s*true/, "keep the native scrollbar draggable")
+if (!/interactive:\s*true/.test(scrollBarSource))
+  errors.push("keep the native scrollbar draggable")
 requirePattern(/flickableDirection:\s*Flickable\.VerticalFlick/, "limit the lesson list to vertical flicking")
 requirePattern(/interactive:\s*contentHeight\s*>\s*height/, "disable list dragging when all lessons fit")
 rejectPattern(/flickDeceleration:/, "do not override the stock Omarchy flick behavior")
+rejectPattern(/pixelAligned:\s*true/, "allow smooth subpixel movement while scrolling")
 rejectPattern(/Component\.onCompleted:\s*lessonEnter\.restart\(\)/, "do not replay row-entry animation while scrolling")
 rejectPattern(/id:\s*scrollTrack/, "do not replace the native scrollbar with a non-interactive track")
+requirePattern(/onEntered:\s*\{\s*if\s*\(!lessonList\.moving\)/, "do not change the selected lesson while the list is moving")
 
 if (errors.length) {
   errors.forEach(error => console.error(`Sensei.qml: ${error}`))

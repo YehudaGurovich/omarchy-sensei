@@ -9,9 +9,9 @@
 //   duration   estimated minutes for a first run
 //   outro      lesson-specific mastery message
 //   difficulty 1–3, using one course-wide scale:
-//              1 Easy — one safe feature with little setup
-//              2 Medium — related actions, setup, or manual confirmation
-//              3 Hard — multi-part or system-changing workflows
+//              1 Easy — basic, low-risk actions with no prior lesson needed
+//              2 Medium — one feature family, based on the Easy skills
+//              3 Hard — combines feature families, needs setup, or has risk
 //   steps      ordered list of Step
 //
 // Step:
@@ -33,7 +33,7 @@
 //              silently to no spotlight.
 //   notOnWorkspace  N — the step cannot complete while the user is already
 //              on workspace N (switching to the workspace you are on emits
-//              no event). Sensei shows a nudge to hop elsewhere first.
+//              no event). The dojo shows a nudge to hop elsewhere first.
 //   hint       optional extra help shown when the step has waited a while;
 //              omitted steps fall back to a generic stuck-hint.
 //   why        one short reason shown with the action so the tutorial teaches
@@ -476,7 +476,7 @@ var LESSONS = [
     keywords: ["focus", "swap", "windows", "arrows", "tile", "rearrange"],
     category: "Windows",
     duration: 7,
-    difficulty: 3,
+    difficulty: 2,
     intro: "Create a second tile, move focus by direction, swap positions, and clean up the practice window.",
     outro: "You can now move your attention and the layout independently, without clicking title bars.",
     steps: [
@@ -822,9 +822,9 @@ var LESSONS = [
     keywords: ["plugin", "plugins", "enable", "microphone", "shell", "bar"],
     category: "System",
     duration: 4,
-    difficulty: 2,
+    difficulty: 3,
     intro: "Add Omarchy’s Microphone control to the bar. The shell reload happens only after the final step.",
-    outro: "The Microphone plugin is active. Reopen Sensei to use it and remove it in the next lesson.",
+    outro: "The Microphone plugin is active. Reopen Omarchy Dojo to use it and remove it in the next lesson.",
     steps: [
       {
         say: "Open the Omarchy menu.",
@@ -834,12 +834,12 @@ var LESSONS = [
         why: "Plugin management lives under Setup because it changes which shell modules are active."
       },
       {
-        say: "Open Setup → Plugins → Enable Plugin, choose Microphone, and press Enter. Sensei will close while the shell reloads; reopen it for the next lesson.",
+        say: "Open Setup → Plugins → Enable Plugin, choose Microphone, and press Enter. Omarchy Dojo will close while the shell reloads; reopen it for the next lesson.",
         bind: null,
         await: { event: "closelayer", data: "^omarchy-menu$" },
         spotlight: "menu",
         hint: "If Microphone is not listed, it is already enabled. Close the menu, skip this step, and continue with the next lesson.",
-        why: "A plugin toggle changes shell configuration. Making it the last step lets Sensei save completion before the panels reload."
+        why: "A plugin toggle changes shell configuration. Making it the last step lets Omarchy Dojo save completion before the panels reload."
       }
     ]
   },
@@ -849,7 +849,7 @@ var LESSONS = [
     keywords: ["plugin", "plugins", "use", "disable", "toggle", "microphone", "mute", "bar"],
     category: "System",
     duration: 5,
-    difficulty: 2,
+    difficulty: 3,
     intro: "Try the Microphone bar control, restore its starting state, then remove the control from the bar.",
     outro: "You used a bar plugin and removed it without deleting its files.",
     steps: [
@@ -879,11 +879,11 @@ var LESSONS = [
         why: "The disable flow uses the same Setup → Plugins route as enable."
       },
       {
-        say: "Open Setup → Plugins → Disable Plugin and choose Microphone. Sensei will close while the shell reloads.",
+        say: "Open Setup → Plugins → Disable Plugin and choose Microphone. Omarchy Dojo will close while the shell reloads.",
         bind: null,
         await: { event: "closelayer", data: "^omarchy-menu$" },
         spotlight: "menu",
-        hint: "Choose Microphone, not Sensei. Disabling Sensei would remove the tutorial from the bar.",
+        hint: "Choose Microphone, not Omarchy Dojo. Disabling the dojo would remove the tutorial from the bar.",
         why: "Disabling a bar plugin removes its layout entry but keeps the plugin installed."
       }
     ]
@@ -1029,7 +1029,7 @@ var LESSONS = [
         await: null,
         spotlight: "window",
         nextLabel: "Text field ready",
-        hint: "If no dictation keys appear on the next step, install Dictation from Omarchy menu → Install → AI, then reopen Sensei after setup restarts the shell.",
+        hint: "If no dictation keys appear on the next step, install Dictation from Omarchy menu → Install → AI, then reopen Omarchy Dojo after setup restarts the shell.",
         why: "Dictation types into the focused field, so cursor placement decides where the transcript goes."
       },
       {
@@ -1080,7 +1080,7 @@ var LESSONS = [
     keywords: ["screenshot", "capture", "ocr", "text", "clipboard", "print screen"],
     category: "Capture",
     duration: 9,
-    difficulty: 2,
+    difficulty: 3,
     intro: "Capture a window with the keyboard region picker, then copy visible text from the screen.",
     outro: "You can now save visual evidence and turn unselectable screen text into editable clipboard text.",
     steps: [
@@ -1447,7 +1447,7 @@ var LESSONS = [
     keywords: ["challenge", "practice", "menu", "emoji", "clipboard", "tools"],
     category: "Challenge",
     duration: 6,
-    difficulty: 2,
+    difficulty: 3,
     intro: "Open, inspect, and dismiss the three overlays you will use every day.",
     outro: "The Omarchy menu, emoji picker, and clipboard history are now one consistent open-search-close pattern.",
     steps: [
@@ -1508,7 +1508,7 @@ var COURSE = LESSONS.map(function(lesson, index) {
   return entry.lesson
 })
 
-function all() {
+function learningPath() {
   return COURSE
 }
 
