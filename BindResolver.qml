@@ -19,6 +19,7 @@ Item {
   signal loaded()
 
   readonly property string scanScript: Qt.resolvedUrl("bin/sensei-binds").toString().replace(/^file:\/\//, "")
+  readonly property string boundedOutputScript: Qt.resolvedUrl("bin/sensei-bounded-output").toString().replace(/^file:\/\//, "")
 
   function refresh() {
     root.ready = false
@@ -91,7 +92,7 @@ Item {
   Process {
     id: hyprctlProcess
     running: false
-    command: ["hyprctl", "binds", "-j"]
+    command: ["bash", root.boundedOutputScript, "262144", "hyprctl", "binds", "-j"]
 
     stdout: StdioCollector {
       waitForEnd: true

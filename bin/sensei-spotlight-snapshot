@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+BOUNDED_OUTPUT="$ROOT/bin/sensei-bounded-output"
+
+bounded_output() {
+  "$BOUNDED_OUTPUT" "$@"
+}
+
+layers=$(bounded_output 131072 hyprctl -j layers)
+monitors=$(bounded_output 131072 hyprctl -j monitors)
+active_window=$(bounded_output 131072 hyprctl -j activewindow)
+active_workspace=$(bounded_output 131072 hyprctl -j activeworkspace)
+
+printf '%s\n---\n%s\n---\n%s\n---\n%s\n' \
+  "$layers" "$monitors" "$active_window" "$active_workspace"

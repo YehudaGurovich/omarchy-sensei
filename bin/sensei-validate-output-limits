@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+BOUNDED_OUTPUT="$ROOT/bin/sensei-bounded-output"
+SPOTLIGHT_SNAPSHOT="$ROOT/bin/sensei-spotlight-snapshot"
+TMP_DIR=$(mktemp -d)
+
+cleanup() {
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+fail() {
+  echo "Output-limit validation failed: $*" >&2
+  exit 1
+}
+
+[[ -x $BOUNDED_OUTPUT ]] || fail "missing executable bin/sensei-bounded-output"
+[[ -x $SPOTLIGHT_SNAPSHOT ]] || fail "missing executable bin/sensei-spotlight-snapshot"
+
+printf '%s' '{"ok":true}' >"$TMP_DIR/expected"
+"$BOUNDED_OUTPUT" 64 printf '%s' '{"ok":true}' >"$TMP_DIR/actual"
+cmp -s "$TMP_DIR/expected" "$TMP_DIR/actual" || fail "changed output below the limit"
+
+"$BOUNDED_OUTPUT" 16 head -c 16 /dev/zero >"$TMP_DIR/at-limit"
+[[ $(wc -c <"$TMP_DIR/at-limit") -eq 16 ]] || fail "rejected output at the limit"
+
+if "$BOUNDED_OUTPUT" 16 head -c 17 /dev/zero >"$TMP_DIR/over-limit"; then
+  fail "accepted output above the limit"
+fi
+[[ ! -s $TMP_DIR/over-limit ]] || fail "forwarded truncated output to QML"
+
+grep -Fq 'command: ["bash", root.boundedOutputScript, "262144", "hyprctl", "binds", "-j"]' \
+  "$ROOT/BindResolver.qml" || fail "runtime bindings bypass the byte limiter"
+grep -Fq 'command: ["bash", root.spotlightSnapshotScript]' \
+  "$ROOT/Sensei.qml" || fail "spotlight snapshots bypass the bounded snapshot command"
+
+for query in layers monitors activewindow activeworkspace; do
+  grep -Eq "bounded_output[[:space:]]+131072[[:space:]]+hyprctl[[:space:]]+-j[[:space:]]+$query" \
+    "$SPOTLIGHT_SNAPSHOT" || fail "spotlight $query output has no byte limit"
+done
+
+echo "Validated hard byte limits on compositor-controlled process output"

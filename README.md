@@ -86,7 +86,8 @@ Everything the Omarchy Dojo uses ships with Omarchy Quattro: `hyprctl`, `bash`,
 `gawk`, `lua`, `jq`, and `xkbcli` (libxkbcommon). No extra package is needed.
 The core plugin only reads your config and writes its own progress file under
 `~/.local/state/omarchy-sensei/`. The optional Super+W integration above adds
-one Hyprland binding.
+one Hyprland binding. Compositor responses used for keybinding fallback and
+spotlight placement have hard byte limits before QML receives them.
 
 Remove with:
 
@@ -181,7 +182,7 @@ in a compact coach card while the desktop keeps keyboard focus.
 
 ## Status
 
-Version 1.7.0 — the walkthrough engine works end to end: live key
+Version 1.7.1 — the walkthrough engine works end to end: live key
 resolution (including Lua `code:` binds via the compiled keymap),
 event-driven step completion (multi-monitor aware), spotlight highlighting,
 persistent progress and belts, and the coach card. Thirty-three lessons and 136
@@ -192,6 +193,9 @@ such as Pacman installation and suspend. See `PLAN.md`.
 
 Recent additions:
 
+- **Bounded compositor reads.** Runtime keybinding and spotlight queries stop
+  before QML receives oversized compositor-controlled responses. A rejected
+  response degrades to the existing no-binding or no-spotlight fallback.
 - **Omarchy Dojo progression.** The browser, bar tooltip, and completion card
   now use the Omarchy Dojo name. Nine Omarchy-titled belts span all 33 lessons,
   each later belt costs more XP, and Black requires full course mastery.
@@ -257,6 +261,7 @@ all active tutorial shortcuts:
 ./bin/sensei-validate-ui
 ./bin/sensei-validate-scroll-speed
 ./bin/sensei-validate-close
+./bin/sensei-validate-output-limits
 ./bin/sensei-validate-package
 ```
 

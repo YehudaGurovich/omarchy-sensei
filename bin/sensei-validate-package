@@ -26,5 +26,6 @@ omarchy plugin validate "$PACKAGE_DIR"
 "$PACKAGE_DIR/bin/sensei-validate-ui"
 "$PACKAGE_DIR/bin/sensei-validate-scroll-speed"
 "$PACKAGE_DIR/bin/sensei-validate-close"
+"$PACKAGE_DIR/bin/sensei-validate-output-limits"
 
 echo "Validated a clean Omarchy Dojo package"

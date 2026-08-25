@@ -35,6 +35,7 @@ Item {
   property string stepNudge: ""
   property string hintText: ""
   property var nextLessonData: null
+  readonly property string spotlightSnapshotScript: Qt.resolvedUrl("bin/sensei-spotlight-snapshot").toString().replace(/^file:\/\//, "")
 
   function nudgeFor(n) {
     return "You are already on workspace " + n
@@ -217,7 +218,7 @@ Item {
   Process {
     id: spotlightProcess
     running: false
-    command: ["bash", "-c", 'printf "%s\\n---\\n%s\\n---\\n%s\\n---\\n%s\\n" "$(hyprctl -j layers)" "$(hyprctl -j monitors)" "$(hyprctl -j activewindow)" "$(hyprctl -j activeworkspace)"']
+    command: ["bash", root.spotlightSnapshotScript]
     onExited: {
       if (root.spotlightRequery) {
         root.spotlightRequery = false

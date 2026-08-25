@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -lt 2 || ! $1 =~ ^[1-9][0-9]*$ ]]; then
+  echo "Usage: sensei-bounded-output <max-bytes> <command> [args...]" >&2
+  exit 64
+fi
+
+MAX_BYTES=$1
+shift
+
+BUFFER=$(mktemp)
+cleanup() {
+  rm -f "$BUFFER"
+}
+trap cleanup EXIT
+
+set +e
+"$@" | head -c "$((MAX_BYTES + 1))" >"$BUFFER"
+statuses=("${PIPESTATUS[@]}")
+set -e
+
+bytes=$(wc -c <"$BUFFER")
+if ((bytes > MAX_BYTES)); then
+  exit 75
+fi
+if ((statuses[1] != 0)); then
+  exit "${statuses[1]}"
+fi
+if ((statuses[0] != 0)); then
+  exit "${statuses[0]}"
+fi
+
+cat "$BUFFER"
