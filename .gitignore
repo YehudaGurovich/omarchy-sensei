@@ -1,2 +1,11 @@
 *.qmlc
 .qmlls.ini
+AGENTS.md
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.kdbx
