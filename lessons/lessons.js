@@ -1029,7 +1029,7 @@ var LESSONS = [
         await: null,
         spotlight: "window",
         nextLabel: "Text field ready",
-        hint: "If no dictation keys appear on the next step, install Dictation from Omarchy menu → Install → AI, then reopen Omarchy Dojo after setup restarts the shell.",
+        hint: "If no dictation keys appear on the next step, install Dictation from the Omarchy menu, then reopen Omarchy Dojo after setup restarts the shell.",
         why: "Dictation types into the focused field, so cursor placement decides where the transcript goes."
       },
       {

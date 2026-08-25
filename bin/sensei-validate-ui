@@ -11,6 +11,8 @@ const bindResolverSource = fs.readFileSync(
   path.resolve(__dirname, "..", "BindResolver.qml"), "utf8")
 const fastScrollSource = fs.readFileSync(
   path.resolve(__dirname, "..", "FastScrollHandler.qml"), "utf8")
+const lessonsSource = fs.readFileSync(
+  path.resolve(__dirname, "..", "lessons", "lessons.js"), "utf8")
 const bindSelectionPath = path.resolve(__dirname, "..", "BindSelection.js")
 const errors = []
 
@@ -62,6 +64,7 @@ if (!fs.existsSync(bindSelectionPath)) {
   vm.runInContext(fs.readFileSync(bindSelectionPath, "utf8"), bindSelection, {
     filename: bindSelectionPath
   })
+  vm.runInContext(lessonsSource, bindSelection, { filename: "lessons/lessons.js" })
   if (!bindSelection.shouldReplaceBinding("code:201", "SPACE"))
     errors.push("BindSelection.js: replace an unresolved keycode with a readable shortcut")
   if (bindSelection.shouldReplaceBinding("SPACE", "code:201"))
@@ -81,9 +84,16 @@ if (!fs.existsSync(bindSelectionPath)) {
       if (!current || bindSelection.shouldReplaceBinding(current.key, parts[2]))
         activeBindings[description] = { modmask: Number(parts[0]) || 0, key: parts[2] }
     })
-    const menuBinding = activeBindings["omarchy menu"]
-    if (menuBinding && bindSelection.unresolvedKeycode(menuBinding.key))
-      errors.push("BindResolver.qml: Omarchy menu resolved to an unreadable keycode")
+    const tutorialDescriptions = new Set(
+      bindSelection.LESSONS.flatMap(lesson =>
+        lesson.steps.map(step => step.bind).filter(Boolean)
+      )
+    )
+    tutorialDescriptions.forEach(description => {
+      const binding = activeBindings[description.toLowerCase()]
+      if (binding && bindSelection.unresolvedKeycode(binding.key))
+        errors.push(`BindResolver.qml: ${description} resolved to an unreadable keycode`)
+    })
   }
 }
 if (!/^import "BindSelection\.js" as BindSelection$/m.test(bindResolverSource)
@@ -95,4 +105,4 @@ if (errors.length) {
   process.exit(1)
 }
 
-console.log("Validated native lesson-list scrolling and readable shortcuts")
+console.log("Validated native lesson-list scrolling and all active tutorial shortcuts")

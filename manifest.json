@@ -5,7 +5,7 @@
   "version": "1.6.0",
   "author": "YehudaGurovich",
   "license": "MIT",
-  "description": "The Omarchy Dojo teaches desktop skills by doing. It reads your real keybindings, verifies each action, and leads from Easy lessons to Hard workflows.",
+  "description": "The Omarchy Dojo teaches desktop skills by doing. It reads your real keybindings, verifies observable results, and leads from Easy lessons to Hard workflows.",
   "kinds": ["overlay", "bar-widget"],
   "keepLoaded": true,
   "entryPoints": {

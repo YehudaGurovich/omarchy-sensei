@@ -227,7 +227,8 @@ Recent additions:
 
 ## Development
 
-Validate the lesson schema, course progression, belts, and scrolling setup:
+Validate the lesson schema, course progression, belts, scrolling setup, and
+all active tutorial shortcuts:
 
 ```sh
 ./bin/sensei-validate-lessons

@@ -124,9 +124,8 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
     breathing); difficulty shown as three dots on every browser row;
     thin rules under both card headers; the completion screen's "Next
     lesson" is now a filled primary button.
-  - dev.sh now restarts the shell by default after syncing (`--hot` keeps
-    the old watcher-driven reload). Rationale: the hot-reload path is the
-    crash trigger below and leaves stale IPC handlers.
+  - dev.sh now restarts the shell after syncing. Rationale: the hot-reload
+    path is the crash trigger below and leaves stale IPC handlers.
   - Crash status confirmed (Aug 22): upstream issue
     quickshell-mirror/quickshell#956 is open with the same stack and a
     root cause (EngineGeneration::destroy() clears extensions but not the
