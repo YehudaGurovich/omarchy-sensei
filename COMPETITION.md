@@ -23,23 +23,20 @@ Requirements (from SUBMISSION.md of the marketplace repo):
 Planned listing:
 
 - Category: **Productivity**
-- Tags: `learning`, `keybindings`, `onboarding`
+- Tags: `Bar`, `Hyprland`, `Quickshell`
+- Suggested missing tag: `Learning`
 - Optional after listing: request automated verification
   (https://github.com/HANCORE-linux/omarchy-plugin-marketplace/issues/new?template=verify-plugin.yml)
 
-## Current release state
+## Release and submission record
 
-Checked on August 25, 2026:
-
-- GitHub repository: **public** at
-  https://github.com/YehudaGurovich/omarchy-sensei
-- Marketplace submission: **validated and ready for listing review** in
-  https://github.com/HANCORE-linux/omarchy-plugin-marketplace/issues/2351
-- Automated Quattro compatibility and security baseline checks: **passed** at
-  commit `438deb7`
+- GitHub repository: https://github.com/YehudaGurovich/omarchy-sensei
+- Marketplace submission: https://github.com/HANCORE-linux/omarchy-plugin-marketplace/issues/2351
+- The marketplace issue records the live status and the exact commit checked
+  by its compatibility and security-baseline automation.
 - Competition deadline: **passed**
 
-## Checklist before submitting
+## Release checklist
 
 - [x] Walkthrough engine works end to end on this machine
 - [x] 33 lessons and 136 steps follow an Easy-to-Hard path
