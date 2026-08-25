@@ -31,8 +31,12 @@ Planned listing:
 
 Checked on August 25, 2026:
 
-- GitHub repository: **private**
-- Marketplace listing: **none found**
+- GitHub repository: **public** at
+  https://github.com/YehudaGurovich/omarchy-sensei
+- Marketplace submission: **validated and ready for listing review** in
+  https://github.com/HANCORE-linux/omarchy-plugin-marketplace/issues/2351
+- Automated Quattro compatibility and security baseline checks: **passed** at
+  commit `438deb7`
 - Competition deadline: **passed**
 
 ## Checklist before submitting
@@ -43,6 +47,6 @@ Checked on August 25, 2026:
 - [x] `preview.png` shows the current centered Dojo on a clean workspace
 - [x] README install command matches the final repository URL
 - [x] Version 1.7.0 release metadata
-- [ ] Make the GitHub repository public
-- [ ] Run a clean install from the public GitHub URL
-- [ ] Submit through the marketplace form
+- [x] Make the GitHub repository public
+- [x] Run a clean install from the public GitHub URL
+- [x] Submit through the marketplace form
