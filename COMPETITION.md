@@ -27,13 +27,22 @@ Planned listing:
 - Optional after listing: request automated verification
   (https://github.com/HANCORE-linux/omarchy-plugin-marketplace/issues/new?template=verify-plugin.yml)
 
+## Current release state
+
+Checked on August 25, 2026:
+
+- GitHub repository: **private**
+- Marketplace listing: **none found**
+- Competition deadline: **passed**
+
 ## Checklist before submitting
 
-- [x] Walkthrough engine works end to end (verified on this machine; a pristine-default VM run was not done — bind resolution reads the live config by design)
-- [x] 8–12 polished lessons, welcome tour chains the basics (10 lessons, all verified)
+- [x] Walkthrough engine works end to end on this machine
+- [x] 33 lessons and 136 steps follow an Easy-to-Hard path
 - [x] `omarchy plugin validate` passes
-- [x] Fresh install test: installed and smoke-tested from the public GitHub URL
-- [x] `preview.png` (welcome tour with spotlight) in the repo
-- [x] README install command matches the final repo URL
-- [x] Version 1.0.0, repo public
-- [ ] Submitted via the marketplace form
+- [x] `preview.png` shows the current centered Dojo on a clean workspace
+- [x] README install command matches the final repository URL
+- [x] Version 1.7.0 release metadata
+- [ ] Make the GitHub repository public
+- [ ] Run a clean install from the public GitHub URL
+- [ ] Submit through the marketplace form

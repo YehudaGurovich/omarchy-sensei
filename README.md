@@ -56,8 +56,25 @@ welcome tour itself:
 omarchy-shell shell toggle io.github.yehudagurovich.sensei '{"lesson":"welcome-tour"}'
 ```
 
-Window-close helpers can dismiss either the dojo or an active lesson without
-accidentally opening it:
+### Close with Super+W
+
+The plugin includes a close wrapper. It dismisses the dojo or coach when one
+is open. Otherwise it runs Omarchy's normal close-window action. Add this to
+`~/.config/hypr/bindings.lua`:
+
+```lua
+hl.unbind("SUPER + W")
+o.bind("SUPER + W", "Close window", "~/.config/omarchy/plugins/io.github.yehudagurovich.sensei/bin/sensei-close")
+```
+
+If you already use a custom close command, give it to the wrapper as the
+fallback:
+
+```sh
+~/.config/omarchy/plugins/io.github.yehudagurovich.sensei/bin/sensei-close ~/.config/hypr/scripts/my-close-command
+```
+
+The direct IPC command remains available for other integrations:
 
 ```sh
 omarchy-shell sensei dismiss
@@ -66,15 +83,19 @@ omarchy-shell sensei dismiss
 ## Requirements
 
 Everything the Omarchy Dojo uses ships with Omarchy Quattro: `hyprctl`, `bash`,
-`gawk`, `lua`, and `xkbcli` (libxkbcommon). No extra installs, no
-configuration changes — the plugin only reads your config and writes its own
-progress file under `~/.local/state/omarchy-sensei/`.
+`gawk`, `lua`, `jq`, and `xkbcli` (libxkbcommon). No extra package is needed.
+The core plugin only reads your config and writes its own progress file under
+`~/.local/state/omarchy-sensei/`. The optional Super+W integration above adds
+one Hyprland binding.
 
 Remove with:
 
 ```sh
 omarchy plugin remove io.github.yehudagurovich.sensei
 ```
+
+Restore your old Super+W binding before removal if you enabled the optional
+close integration.
 
 ## Usage
 
@@ -88,10 +109,8 @@ omarchy plugin remove io.github.yehudagurovich.sensei
    header or the coach header to move either panel. During a walkthrough the
    desktop keeps keyboard focus — use the coach card's buttons to skip a
    step or end the lesson.
-4. In the dojo, `Esc` clears the search; `Esc` again closes. On a system whose
-   `Super + W` close helper calls `omarchy-shell sensei dismiss` for the
-   `sensei` and `sensei-coach` layers, the normal close shortcut closes both
-   the dojo and the active coach.
+4. In the dojo, `Esc` clears the search; `Esc` again closes. If you enabled the
+   packaged close wrapper, Super+W closes both the dojo and the active coach.
 
 ## Lessons
 
@@ -162,7 +181,7 @@ in a compact coach card while the desktop keeps keyboard focus.
 
 ## Status
 
-Version 1.6.0 — the walkthrough engine works end to end: live key
+Version 1.7.0 — the walkthrough engine works end to end: live key
 resolution (including Lua `code:` binds via the compiled keymap),
 event-driven step completion (multi-monitor aware), spotlight highlighting,
 persistent progress and belts, and the coach card. Thirty-three lessons and 136
@@ -179,11 +198,9 @@ Recent additions:
 - **A consistent Easy-to-Hard path.** One difficulty scale applies to every
   lesson. The default order contains all Easy lessons first, then Medium,
   then Hard.
-- **Native scrolling.** The lesson list uses Omarchy's normal interactive
-  scrollbar with a tested 2× touchpad gain and a three-card mouse-wheel step.
-  Mouse-wheel steps use a short, smooth motion. Touchpad scrolling applies
-  each update immediately, without animation.
-  Hover effects pause while you scroll. Nearby rows are
+- **Native scrolling.** Touchpad gestures stay inside Qt's native Flickable
+  path, including momentum. A real mouse wheel keeps the fast three-card step
+  and short smooth motion. Hover effects pause while you scroll. Nearby rows are
   prepared and reused. A fresh open starts at the top, and filters reset the
   view to their first result.
 - **Twenty-one advanced workflows.** The course now teaches Super + Space menu
@@ -224,6 +241,11 @@ Recent additions:
 - **A penguin in your bar.** Omarchy Dojo ships a bar widget: one click opens the
   dojo, and a first-time button starts the welcome tour. Its hover text shows
   only the Dojo name and total XP progress.
+- **Smaller module interfaces.** `Sensei.qml` controls lesson state and IPC.
+  `DojoBrowser.qml` owns course discovery, and `LessonCoach.qml` owns the live
+  walkthrough. Shared buttons and menu-event contracts live in one place.
+- **Packaged close integration.** `bin/sensei-close` gives Super+W one safe
+  route for the dojo, coach, and normal windows.
 
 ## Development
 
@@ -234,6 +256,8 @@ all active tutorial shortcuts:
 ./bin/sensei-validate-lessons
 ./bin/sensei-validate-ui
 ./bin/sensei-validate-scroll-speed
+./bin/sensei-validate-close
+./bin/sensei-validate-package
 ```
 
 ## License

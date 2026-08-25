@@ -12,7 +12,9 @@ if omarchy-hyprland-session-locked; then
 fi
 
 mkdir -p "$DEST"
-rsync -a --delete --exclude '.git' "$SRC/" "$DEST/"
+rsync -a --delete --delete-excluded \
+  --filter="merge $SRC/package.rsync-filter" \
+  "$SRC/" "$DEST/"
 
 omarchy restart shell
 echo "Synced to $DEST and restarted the shell."

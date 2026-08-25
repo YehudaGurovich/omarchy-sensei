@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "io.github.yehudagurovich.sensei",
   "name": "Omarchy Dojo",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "author": "YehudaGurovich",
   "license": "MIT",
   "description": "The Omarchy Dojo teaches desktop skills by doing. It reads your real keybindings, verifies observable results, and leads from Easy lessons to Hard workflows.",

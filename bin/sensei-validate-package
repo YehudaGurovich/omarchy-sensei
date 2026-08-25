@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+PACKAGE_DIR=$(mktemp -d)
+
+[[ -f $ROOT/package.rsync-filter ]]
+grep -Fq -- '--filter="merge $SRC/package.rsync-filter"' "$ROOT/dev.sh"
+grep -Fq -- '--filter="merge $ROOT/package.rsync-filter"' "$0"
+! grep -Eq -- "--exclude[ =].*(\.git|AGENTS\.md)" "$ROOT/dev.sh" "$0"
+
+cleanup() {
+  rm -rf "$PACKAGE_DIR"
+}
+trap cleanup EXIT
+
+rsync -a --delete-excluded \
+  --filter="merge $ROOT/package.rsync-filter" \
+  "$ROOT/" "$PACKAGE_DIR/"
+
+[[ ! -e $PACKAGE_DIR/.git ]]
+[[ ! -e $PACKAGE_DIR/AGENTS.md ]]
+
+omarchy plugin validate "$PACKAGE_DIR"
+"$PACKAGE_DIR/bin/sensei-validate-lessons"
+"$PACKAGE_DIR/bin/sensei-validate-ui"
+"$PACKAGE_DIR/bin/sensei-validate-scroll-speed"
+"$PACKAGE_DIR/bin/sensei-validate-close"
+
+echo "Validated a clean Omarchy Dojo package"

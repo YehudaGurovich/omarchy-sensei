@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Dismiss Omarchy Dojo when it owns the screen. Otherwise run the supplied
+# close command, or use Omarchy's normal active-window close action.
+set -euo pipefail
+
+HYPRCTL=${SENSEI_HYPRCTL_BIN:-hyprctl}
+OMARCHY_SHELL=${SENSEI_OMARCHY_SHELL_BIN:-omarchy-shell}
+
+if [[ -n ${SENSEI_LAYERS_JSON:-} ]]; then
+  layers=$SENSEI_LAYERS_JSON
+else
+  layers=$($HYPRCTL layers -j)
+fi
+
+if jq -e '
+    any(..; objects and (.namespace? // ""
+      | test("^sensei(-coach)?$")))
+  ' <<<"$layers" >/dev/null; then
+  "$OMARCHY_SHELL" sensei dismiss >/dev/null
+  exit 0
+fi
+
+if (( $# > 0 )); then
+  exec "$@"
+fi
+
+exec "$HYPRCTL" dispatch 'hl.dsp.window.close()'

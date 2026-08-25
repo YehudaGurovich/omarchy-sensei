@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+CLOSE="$ROOT/bin/sensei-close"
+
+[[ -x $CLOSE ]] || {
+  echo "bin/sensei-close: missing executable close wrapper" >&2
+  exit 1
+}
+
+SENSEI_LAYERS_JSON='{"levels":{"overlay":[{"namespace":"sensei"}]}}' \
+  SENSEI_OMARCHY_SHELL_BIN=/bin/true \
+  "$CLOSE" /bin/false
+
+SENSEI_LAYERS_JSON='{"levels":{"overlay":[{"namespace":"omarchy-menu"}]}}' \
+  "$CLOSE" /bin/true
+
+if SENSEI_LAYERS_JSON='{}' "$CLOSE" /bin/false; then
+  echo "bin/sensei-close: fallback failure was hidden" >&2
+  exit 1
+fi
+
+echo "Validated Dojo dismissal and close-command fallback"

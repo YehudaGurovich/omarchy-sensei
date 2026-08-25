@@ -5,12 +5,21 @@ const path = require("path")
 const childProcess = require("child_process")
 const vm = require("vm")
 
-const source = fs.readFileSync(path.resolve(__dirname, "..", "Sensei.qml"), "utf8")
+const controllerSource = fs.readFileSync(
+  path.resolve(__dirname, "..", "Sensei.qml"), "utf8")
+const source = fs.readFileSync(
+  path.resolve(__dirname, "..", "DojoBrowser.qml"), "utf8")
+const coachSource = fs.readFileSync(
+  path.resolve(__dirname, "..", "LessonCoach.qml"), "utf8")
 const barSource = fs.readFileSync(path.resolve(__dirname, "..", "BarWidget.qml"), "utf8")
 const bindResolverSource = fs.readFileSync(
   path.resolve(__dirname, "..", "BindResolver.qml"), "utf8")
 const fastScrollSource = fs.readFileSync(
   path.resolve(__dirname, "..", "FastScrollHandler.qml"), "utf8")
+const beltBadgePath = path.resolve(__dirname, "..", "BeltBadge.qml")
+const beltBadgeSource = fs.existsSync(beltBadgePath)
+  ? fs.readFileSync(beltBadgePath, "utf8")
+  : ""
 const lessonsSource = fs.readFileSync(
   path.resolve(__dirname, "..", "lessons", "lessons.js"), "utf8")
 const bindSelectionPath = path.resolve(__dirname, "..", "BindSelection.js")
@@ -31,8 +40,30 @@ const scrollBarSource = scrollBarStart >= 0 && scrollBarEnd > scrollBarStart
   : ""
 
 requirePattern(/^import QtQuick\.Controls$/m, "use Omarchy's native Qt Quick controls")
+if (!/DojoBrowser\s*\{/.test(controllerSource)
+    || !/LessonCoach\s*\{/.test(controllerSource))
+  errors.push("Sensei.qml: keep the browser and coach behind separate module interfaces")
+if (/PanelWindow\s*\{/.test(controllerSource))
+  errors.push("Sensei.qml: keep window rendering out of the lesson controller")
+if (!/PanelWindow\s*\{/.test(coachSource))
+  errors.push("LessonCoach.qml: render the walkthrough through the coach module")
+if (!fs.existsSync(beltBadgePath))
+  errors.push("BeltBadge.qml: keep the belt summary behind one shared component")
+if (!/^import qs\.Commons$/m.test(beltBadgeSource))
+  errors.push("BeltBadge.qml: import Style from the shared Commons module")
+if (/component BeltBadge\s*:/.test(source) || /component BeltBadge\s*:/.test(coachSource))
+  errors.push("BeltBadge.qml: do not duplicate the shared badge inside either view")
+if (!/BeltBadge\s*\{/.test(source) || !/BeltBadge\s*\{/.test(coachSource))
+  errors.push("BeltBadge.qml: use the shared badge in the browser and coach")
+if (/function (beltSummary|stepComplete|startLesson|openBrowser|dismiss)\s*\(/.test(coachSource))
+  errors.push("LessonCoach.qml: emit view signals directly instead of forwarding them")
 if (!/^import "Scroll\.js" as Scroll$/m.test(fastScrollSource))
   errors.push("use the tested fast-scroll policy")
+if (!/scrollGestureEnabled:\s*false/.test(fastScrollSource))
+  errors.push("FastScrollHandler.qml: leave touchpad gestures with native Flickable momentum")
+if (/flickable\.contentY\s*=/.test(fastScrollSource)
+    || /blocking:\s*true/.test(fastScrollSource))
+  errors.push("FastScrollHandler.qml: do not block or directly rewrite touchpad position")
 requirePattern(/ScrollBar\.vertical:\s*ScrollBar\s*\{/, "attach an interactive native scrollbar to the lesson list")
 if (!/interactive:\s*true/.test(scrollBarSource))
   errors.push("keep the native scrollbar draggable")
@@ -41,7 +72,7 @@ requirePattern(/interactive:\s*contentHeight\s*>\s*height/, "disable list draggi
 requirePattern(/reuseItems:\s*true/, "reuse lesson rows instead of rebuilding them during scrolling")
 requirePattern(/height:\s*Math\.max\(0,[\s\S]*?parent\.height\s*-\s*dojoHeader\.height/, "keep the lesson list geometry valid while the panel is sizing")
 requirePattern(/cacheBuffer:\s*Math\.max\(0,\s*height\s*\*\s*2\)/, "prepare nearby lesson rows without using a negative startup buffer")
-requirePattern(/function openBrowser\(\)[\s\S]*?rebuildDisplay\(true\)/, "start each dojo visit at the top of the learning path")
+requirePattern(/function open\(\)[\s\S]*?rebuildDisplay\(true\)/, "start each dojo visit at the top of the learning path")
 requirePattern(/if\s*\(resetView\)\s*lessonList\.positionViewAtBeginning\(\)/, "reset the lesson offset after opening or changing filters")
 rejectPattern(/flickDeceleration:/, "do not override the stock Omarchy flick behavior")
 rejectPattern(/pixelAligned:\s*true/, "allow smooth subpixel movement while scrolling")
@@ -105,4 +136,4 @@ if (errors.length) {
   process.exit(1)
 }
 
-console.log("Validated native lesson-list scrolling and all active tutorial shortcuts")
+console.log("Validated modular Dojo UI, native scrolling, and all active tutorial shortcuts")

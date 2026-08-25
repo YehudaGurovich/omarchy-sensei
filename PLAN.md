@@ -1,6 +1,7 @@
 # Omarchy Dojo — build plan
 
-Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
+Target: marketplace-ready release. The Mon Aug 24, 09:00 CEST competition
+listing deadline passed before this branch was ready to publish.
 
 ## Architecture decisions
 
@@ -222,8 +223,14 @@ Target: listed on the marketplace before Mon Aug 24, 09:00 CEST.
     traits: broad orange feet, a pear-shaped belly, tall face patches, and a
     broad two-part beak. The header uses the official Omarchy logo, and the
     bar hover text shows only the Dojo name and total XP progress.
-- **Day 4 round 8 (Sun Aug 24 morning is the deadline — finish Sat night):**
-  preview.png refresh, fresh-install test, submit form.
+- **Day 4 round 8 — PARTIAL (Aug 25):** refreshed `preview.png` from the live
+  centered Dojo on a clean workspace. A public-URL fresh install and the
+  marketplace form remain blocked while the repository is private.
+- **Day 4 round 9 — DONE (Aug 25):** moved course discovery and lesson coaching
+  behind `DojoBrowser.qml` and `LessonCoach.qml`; kept `Sensei.qml` as the
+  lesson-state and IPC controller. Touchpad gestures now use native Flickable
+  momentum. The plugin ships a tested Super+W close wrapper and shares the
+  Omarchy-menu event contract across lessons.
 
 ## Dev loop
 

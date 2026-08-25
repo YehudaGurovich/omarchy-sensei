@@ -47,6 +47,11 @@ var TERMINAL_OPENWINDOW = {
   data: "^[^,]*,[^,]*,([Aa]lacritty|foot|footclient|kitty|com\\.mitchellh\\.ghostty|ghostty|org\\.wezfurlong\\.wezterm|wezterm|[Kk]onsole|[Ss]t|[Xx]term),"
 }
 
+// The menu open/close contract is used throughout the course. Keep it in one
+// place so a namespace change cannot make only some lessons stop advancing.
+var OMARCHY_MENU_OPENED = { event: "openlayer", data: "^omarchy-menu$" }
+var OMARCHY_MENU_CLOSED = { event: "closelayer", data: "^omarchy-menu$" }
+
 // Reaching workspace N is verified by result, not by keypress. Two events
 // can prove it: `workspace` (a monitor switched to N) and `focusedmon`
 // ("MONITOR,N" — focus moved to a monitor already showing N). The second is
@@ -290,14 +295,14 @@ var LESSONS = [
       {
         say: "Open the Omarchy menu.",
         bind: "Omarchy menu",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "The menu is the reliable fallback when you know the goal but not its shortcut."
       },
       {
         say: "Have a look around, then close it with Esc.",
         bind: null,
-        await: { event: "closelayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_CLOSED,
         spotlight: "menu",
         why: "Escape closes overlays consistently and returns keyboard control to your work."
       }
@@ -368,14 +373,14 @@ var LESSONS = [
       {
         say: "Open the full Omarchy menu.",
         bind: "Omarchy menu",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "The full menu exposes apps, settings, installs, capture tools, and power controls from one place."
       },
       {
         say: "Type install, move with the arrow keys, open a submenu with Enter, then press Esc until the menu closes.",
         bind: null,
-        await: { event: "closelayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_CLOSED,
         spotlight: "menu",
         hint: "Typing filters the visible choices. Enter opens the selected row; Esc backs out or closes the menu.",
         why: "Search is faster than remembering where every command sits in the hierarchy."
@@ -383,14 +388,14 @@ var LESSONS = [
       {
         say: "Open the focused Apps menu.",
         bind: "Apps menu",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "The Apps route removes every system command when you only want to launch software."
       },
       {
         say: "Type the name of a harmless app, press Enter to launch it, and wait for the menu to close.",
         bind: null,
-        await: { event: "closelayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_CLOSED,
         spotlight: "menu",
         why: "A name and Enter are enough to launch any desktop app from any workspace."
       }
@@ -409,28 +414,28 @@ var LESSONS = [
       {
         say: "Open the main keybinding finder.",
         bind: "Keybindings",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "This list is built from your active configuration, so it includes your overrides."
       },
       {
         say: "Type workspace, inspect the matches, then close the finder with Esc.",
         bind: null,
-        await: { event: "closelayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_CLOSED,
         spotlight: "menu",
         why: "Searching by the result you want is easier than searching by a key you do not know."
       },
       {
         say: "Open the Herdr keybinding finder — this is the Super + Ctrl + K shortcut.",
         bind: "Herdr keybindings",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "Herdr has its own command layer, so Omarchy gives it a separate searchable reference."
       },
       {
         say: "Search for navigate, inspect the results, then close the finder with Esc.",
         bind: null,
-        await: { event: "closelayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_CLOSED,
         spotlight: "menu",
         why: "Keeping application-specific bindings separate prevents the global list from becoming noise."
       }
@@ -680,14 +685,14 @@ var LESSONS = [
       {
         say: "Open the theme switcher.",
         bind: "Theme menu",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "The switcher previews the installed themes from a focused list."
       },
       {
         say: "Choose a theme with the arrows and press Enter; wait for the switcher to close.",
         bind: null,
-        await: { event: "closelayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_CLOSED,
         spotlight: "menu",
         hint: "The selection changes application colors, terminal colors, borders, and shell surfaces together.",
         why: "One coordinated theme prevents different desktop parts from drifting into unrelated color schemes."
@@ -695,14 +700,14 @@ var LESSONS = [
       {
         say: "Open the background switcher for the active theme.",
         bind: "Background switcher",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "Themes can provide several matching backgrounds without duplicating the rest of the style."
       },
       {
         say: "Choose a background and press Enter; wait for the switcher to close.",
         bind: null,
-        await: { event: "closelayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_CLOSED,
         spotlight: "menu",
         why: "The selected background persists, so the next login keeps the same visual setup."
       }
@@ -729,14 +734,14 @@ var LESSONS = [
       {
         say: "Open the Toggle menu.",
         bind: "Toggle menu",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "The Toggle menu groups reversible system features in one short list."
       },
       {
         say: "Choose Stay Awake and press Enter; wait for the menu to close.",
         bind: null,
-        await: { event: "closelayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_CLOSED,
         spotlight: "menu",
         why: "The command switches between normal idle and a mode that keeps the screen and session awake."
       },
@@ -751,14 +756,14 @@ var LESSONS = [
       {
         say: "Open the Toggle menu again.",
         bind: "Toggle menu",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "Repeating the same route makes the reversible pattern easy to remember."
       },
       {
         say: "Choose Stay Awake once more and press Enter to restore the state you started with.",
         bind: null,
-        await: { event: "closelayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_CLOSED,
         spotlight: "menu",
         why: "Returning the toggle avoids an accidental unlocked screen or an interrupted long task later."
       }
@@ -785,7 +790,7 @@ var LESSONS = [
       {
         say: "Open the System menu.",
         bind: "System menu",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "The focused System route gives direct access to lock, suspend, logout, reboot, and shutdown."
       },
@@ -801,7 +806,7 @@ var LESSONS = [
       {
         say: "Open the System menu again.",
         bind: "System menu",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "The same route keeps every power action discoverable even if you forget a direct shortcut."
       },
@@ -829,14 +834,14 @@ var LESSONS = [
       {
         say: "Open the Omarchy menu.",
         bind: "Omarchy menu",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "Plugin management lives under Setup because it changes which shell modules are active."
       },
       {
         say: "Open Setup → Plugins → Enable Plugin, choose Microphone, and press Enter. Omarchy Dojo will close while the shell reloads; reopen it for the next lesson.",
         bind: null,
-        await: { event: "closelayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_CLOSED,
         spotlight: "menu",
         hint: "If Microphone is not listed, it is already enabled. Close the menu, skip this step, and continue with the next lesson.",
         why: "A plugin toggle changes shell configuration. Making it the last step lets Omarchy Dojo save completion before the panels reload."
@@ -874,14 +879,14 @@ var LESSONS = [
       {
         say: "Open the Omarchy menu again.",
         bind: "Omarchy menu",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "The disable flow uses the same Setup → Plugins route as enable."
       },
       {
         say: "Open Setup → Plugins → Disable Plugin and choose Microphone. Omarchy Dojo will close while the shell reloads.",
         bind: null,
-        await: { event: "closelayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_CLOSED,
         spotlight: "menu",
         hint: "Choose Microphone, not Omarchy Dojo. Disabling the dojo would remove the tutorial from the bar.",
         why: "Disabling a bar plugin removes its layout entry but keeps the plugin installed."
@@ -901,7 +906,7 @@ var LESSONS = [
       {
         say: "Open the Omarchy menu.",
         bind: "Omarchy menu",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "The Install section provides a guided entry point to Arch packages and optional software."
       },
@@ -960,7 +965,7 @@ var LESSONS = [
       {
         say: "Open the Omarchy menu.",
         bind: "Omarchy menu",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "Web App lives under Install because it creates a persistent desktop launcher."
       },
@@ -999,14 +1004,14 @@ var LESSONS = [
       {
         say: "Open the Apps menu.",
         bind: "Apps menu",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "New desktop entries become available through the normal app launcher."
       },
       {
         say: "Type the new app name and press Enter to launch it.",
         bind: null,
-        await: { event: "closelayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_CLOSED,
         spotlight: "menu",
         hint: "You can remove it later from Omarchy menu → Remove → Web App.",
         why: "The site now opens in a focused app window without normal browser tabs or controls."
@@ -1144,7 +1149,7 @@ var LESSONS = [
       {
         say: "Open the screen-recording controls.",
         bind: "Screenrecording",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "The first press opens recording choices when no recording is active."
       },
@@ -1182,14 +1187,14 @@ var LESSONS = [
       {
         say: "Open the Share menu.",
         bind: "Share",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "Omarchy uses LocalSend to transfer files to nearby devices without uploading them to a cloud service."
       },
       {
         say: "Choose File, select the recording from Videos, then finish or cancel the LocalSend transfer.",
         bind: null,
-        await: { event: "closelayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_CLOSED,
         spotlight: "menu",
         why: "Selecting the saved file completes the path from capture to a nearby phone or computer."
       }
@@ -1304,14 +1309,14 @@ var LESSONS = [
       {
         say: "Open the reminder prompt.",
         bind: "Set reminder",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "The direct prompt removes the need to navigate through the main menu for a common timed action."
       },
       {
         say: "Set it for 1 minute, enter Practice complete as the message, and submit the prompt.",
         bind: null,
-        await: { event: "closelayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_CLOSED,
         spotlight: "menu",
         why: "A short timer lets you verify the complete reminder path during this lesson."
       },
@@ -1454,14 +1459,14 @@ var LESSONS = [
       {
         say: "Open the Omarchy menu.",
         bind: "Omarchy menu",
-        await: { event: "openlayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_OPENED,
         spotlight: null,
         why: "The main menu is where you discover actions before their shortcuts become habit."
       },
       {
         say: "Close the menu with Esc.",
         bind: null,
-        await: { event: "closelayer", data: "^omarchy-menu$" },
+        await: OMARCHY_MENU_CLOSED,
         spotlight: "menu",
         why: "Escape is the shared exit for Omarchy overlays, so you always know how to return."
       },
