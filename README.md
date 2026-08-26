@@ -6,6 +6,11 @@ Ask *"how do I…?"*, pick a lesson, and the Omarchy Dojo walks you through it
 on your real desktop. The penguin sensei tells you which keys to press, then
 waits until you perform the action before moving on.
 
+Omarchy should feel accessible from the first login. The Dojo turns essential
+desktop skills into visual, hands-on lessons so new users can see what to do,
+practice it on their real system, and build confidence. It was built to help
+make this the year of Linux by giving anyone a clear path into Omarchy.
+
 ## Why it is different
 
 - **It reads your config, not the defaults.** Keybindings resolve live from
@@ -182,7 +187,7 @@ in a compact coach card while the desktop keeps keyboard focus.
 
 ## Status
 
-Version 1.7.1 — the walkthrough engine works end to end: live key
+Version 1.7.2 — the walkthrough engine works end to end: live key
 resolution (including Lua `code:` binds via the compiled keymap),
 event-driven step completion (multi-monitor aware), spotlight highlighting,
 persistent progress and belts, and the coach card. Thirty-three lessons and 136
@@ -202,11 +207,11 @@ Recent additions:
 - **A consistent Easy-to-Hard path.** One difficulty scale applies to every
   lesson. The default order contains all Easy lessons first, then Medium,
   then Hard.
-- **Native scrolling.** Touchpad gestures stay inside Qt's native Flickable
-  path, including momentum. A real mouse wheel keeps the fast three-card step
-  and short smooth motion. Hover effects pause while you scroll. Nearby rows are
-  prepared and reused. A fresh open starts at the top, and filters reset the
-  view to their first result.
+- **Responsive scrolling.** Touchpad pixel updates move the lesson list
+  immediately. A real mouse wheel keeps the fast three-card step and short
+  smooth motion. Hover effects pause while you scroll. Nearby rows are prepared
+  and reused. A fresh open starts at the top, and filters reset the view to
+  their first result.
 - **Twenty-one advanced workflows.** The course now teaches Super + Space menu
   navigation, Super + Ctrl + K, silent window moves, focus and swap, resizing,
   screen-space controls, layouts, themes, Stay Awake, suspend/resume, plugins,

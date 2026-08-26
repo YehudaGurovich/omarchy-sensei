@@ -1,15 +1,12 @@
-// Keep continuous touchpad gestures in ListView so Qt supplies native
-// momentum. Only discrete mouse-wheel input uses the larger row step.
+// Fast, predictable lesson-list scrolling for both touchpads and
+// discrete mouse wheels.
 
-var WHEEL_ROWS = 3
-
-function shouldHandleInput(pixelY) {
-  return !(Number(pixelY) || 0)
-}
+const TOUCHPAD_GAIN = 2
+const WHEEL_ROWS = 3
 
 function contentDelta(pixelY, angleY, rowHeight) {
   var pixels = Number(pixelY) || 0
-  if (pixels) return 0
+  if (pixels) return pixels * TOUCHPAD_GAIN
 
   var angle = Number(angleY) || 0
   var height = Math.max(1, Number(rowHeight) || 1)

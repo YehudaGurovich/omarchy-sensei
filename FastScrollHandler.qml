@@ -1,7 +1,7 @@
 import QtQuick
 import "Scroll.js" as Scroll
 
-MouseArea {
+WheelHandler {
   id: root
 
   required property Flickable flickable
@@ -17,12 +17,13 @@ MouseArea {
   }
   readonly property bool inputActive: inputIdle.running
 
-  anchors.fill: parent
-  acceptedButtons: Qt.NoButton
-  scrollGestureEnabled: false
+  target: null
+  orientation: Qt.Vertical
+  acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+  blocking: true
 
   function applyInput(pixelY, angleY) {
-    if (!Scroll.shouldHandleInput(pixelY)) return false
+    var useImmediateScroll = !!(Number(pixelY) || 0)
     if (!inputIdle.running) {
       root.flickable.cancelFlick()
       root.scrollMotion.stop()
@@ -33,6 +34,14 @@ MouseArea {
     var minimum = root.flickable.originY
     var maximum = minimum + Math.max(
       0, root.flickable.contentHeight - root.flickable.height)
+
+    if (useImmediateScroll) {
+      root.scrollMotion.stop()
+      root.scrollDestination = Scroll.clampContentY(
+        root.flickable.contentY - delta, minimum, maximum)
+      root.flickable.contentY = root.scrollDestination
+      return true
+    }
 
     if (!root.scrollMotion.running)
       root.scrollDestination = root.flickable.contentY

@@ -228,9 +228,13 @@ listing deadline passed before this branch was ready to publish.
   marketplace form remain blocked while the repository is private.
 - **Day 4 round 9 — DONE (Aug 25):** moved course discovery and lesson coaching
   behind `DojoBrowser.qml` and `LessonCoach.qml`; kept `Sensei.qml` as the
-  lesson-state and IPC controller. Touchpad gestures now use native Flickable
-  momentum. The plugin ships a tested Super+W close wrapper and shares the
-  Omarchy-menu event contract across lessons.
+  lesson-state and IPC controller. The plugin ships a tested Super+W close
+  wrapper and shares the Omarchy-menu event contract across lessons. On Aug 26,
+  explicit touchpad handling was restored because native Flickable fallback did
+  not move the lesson list.
+- **Day 4 round 10 — DONE (Aug 26):** version 1.7.2 restores touchpad scrolling
+  and states the plugin's purpose: make Omarchy accessible from the first login
+  through visual, hands-on lessons that help anyone learn Linux with confidence.
 
 ## Dev loop
 

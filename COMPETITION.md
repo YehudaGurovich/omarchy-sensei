@@ -43,7 +43,7 @@ Planned listing:
 - [x] `omarchy plugin validate` passes
 - [x] `preview.png` shows the current centered Dojo on a clean workspace
 - [x] README install command matches the final repository URL
-- [x] Version 1.7.0 release metadata
+- [x] Version 1.7.2 release metadata
 - [x] Make the GitHub repository public
 - [x] Run a clean install from the public GitHub URL
 - [x] Submit through the marketplace form

@@ -60,10 +60,11 @@ TestCase {
     compare(list.contentY, 0)
   }
 
-  function test_continuous_touchpad_stays_native() {
-    compare(fastScroll.applyInput(-8, 0), false)
-    compare(list.contentY, 0)
-    verify(!fastScroll.inputActive)
+  function test_continuous_touchpad_tracks_each_update() {
+    for (var index = 0; index < 12; index++) {
+      compare(fastScroll.applyInput(-8, 0), true)
+      compare(list.contentY, (index + 1) * 16)
+    }
   }
 
 }

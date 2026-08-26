@@ -19,11 +19,8 @@ function expectEqual(actual, expected, message) {
   if (actual !== expected) errors.push(`${message}: expected ${expected}, found ${actual}`)
 }
 
-expectEqual(context.shouldHandleInput(8), false, "continuous touchpad input stays native")
-expectEqual(context.shouldHandleInput(-8), false, "continuous touchpad direction stays native")
-expectEqual(context.shouldHandleInput(0), true, "discrete wheel input uses the row policy")
-expectEqual(context.contentDelta(8, 0, 78), 0, "continuous input is not applied twice")
-expectEqual(context.contentDelta(-8, 0, 78), 0, "reverse continuous input is not applied twice")
+expectEqual(context.contentDelta(8, 0, 78), 16, "touchpad pixels use 2x gain")
+expectEqual(context.contentDelta(-8, 0, 78), -16, "touchpad direction is preserved")
 expectEqual(context.contentDelta(0, 120, 78), 234, "one wheel notch moves three lesson rows")
 expectEqual(context.contentDelta(0, -120, 78), -234, "wheel direction is preserved")
 expectEqual(context.clampContentY(-20, 0, 1000), 0, "scrolling clamps at the top")
@@ -54,4 +51,4 @@ if (qmlTest.status !== 0) {
   process.exit(qmlTest.status || 1)
 }
 
-console.log("Validated native touchpad momentum and three-row wheel steps")
+console.log("Validated immediate 2x touchpad movement and three-row wheel steps")
